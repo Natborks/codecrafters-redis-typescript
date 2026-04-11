@@ -9,7 +9,7 @@ console.log("Logs from your program will appear here!");
 const server: net.Server = net.createServer((connection: net.Socket) => {
   // Handle connection
   connection.on('data', (data: Buffer) => {
-    console.log("DATA is: ",data.toString())
+    console.log("DATA is: ",data.toString().includes("PING"))
 
 
     const scanner = new Scanner(data.toString("utf8"))
