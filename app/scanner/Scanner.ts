@@ -58,18 +58,17 @@ export default class Scanner {
     }
 
     private extractString() {
-        
         while (!this.isAtEnd()) {
            const currentChar = this.#source[this.#current] 
            if (!this.isAlpha(currentChar)) {
-                const literal = this.#source.substring(this.#start, this.#current)
+                const literal = this.extractLiteral()
                 this.addToken(TokenType.STRING, literal)
                 return 
            }
 
            this.advance()
         }
-        const literal = this.#source.substring(this.#start, this.#current)
+        const literal = this.extractLiteral()
         this.addToken(TokenType.STRING, literal)
     }
 
@@ -81,7 +80,7 @@ export default class Scanner {
         while (!this.isAtEnd()) {
             const char = this.#source[this.#current]
             if (!this.isNum(char)) {
-                const literal = this.#source.substring(this.#start, this.#current)
+                const literal = this.extractLiteral()
                 this.addToken(TokenType.NUMBER, literal)
                 return
             } 
@@ -89,13 +88,13 @@ export default class Scanner {
             this.advance()
         }
 
-        const literal = this.#source.substring(this.#start, this.#current)
+        const literal = this.extractLiteral()
         this.addToken(TokenType.NUMBER, literal)
 
     }
 
     private addToken(type: TokenType, literal: any) : void {
-        const lexeme = this.#source.substring(this.#start, this.#current)
+        const lexeme = this.extractLiteral()
         this.#tokens.push(new Token(type, lexeme, literal))
     }
 
@@ -105,6 +104,10 @@ export default class Scanner {
      
     private isNum(c: string): boolean {
         return /\d/.test(c)
+    }
+
+    private extractLiteral(): string {
+        return this.#source.substring(this.#start, this.#current)
     }
 
 }
