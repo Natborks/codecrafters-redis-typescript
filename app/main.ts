@@ -20,7 +20,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const literal = token.literal
         const length = literal.length
         
-        response += `${length}\r\n${literal}\r\n`
+        response.concat(`${length}\r\n${literal}\r\n`)
       }
 
       connection.write(response)
