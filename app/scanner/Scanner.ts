@@ -108,11 +108,3 @@ export default class Scanner {
     }
 
 }
-
-function testScanner () {
-    const scanner = new Scanner("*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n")
-    const tokens = scanner.scanTokens()
-    console.log(tokens)
-}
-
-testScanner()
