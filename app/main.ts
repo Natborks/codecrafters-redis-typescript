@@ -22,10 +22,10 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         
         response = response.concat(`${length}\r\n${literal}\r\n`)
       }
-
-      connection.write(response)
     }
+    connection.write(response)
   })
+
 });
 
 server.listen(6379, "127.0.0.1");
