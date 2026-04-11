@@ -13,7 +13,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
 
     const scanner = new Scanner(data)
 
-    let response = ""
+    let response = "$"
     for (const token of scanner.scanTokens()) {
       if (token.type === TokenType.STRING) {
         if (token.literal === "ECHO") continue
@@ -21,7 +21,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const literal = token.literal
         const length = literal.length
         
-        response += `${length}\r\n${literal}\r\n`
+        response += `{length}\r\n${literal}\r\n`
       }
 
       connection.write(response)
