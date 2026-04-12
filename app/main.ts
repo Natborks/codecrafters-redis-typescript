@@ -11,6 +11,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
   connection.on('data', (data: Buffer) => {
     const parser = new Parser(data.toString())
     const [command, ...args] = parser.getParsedString()
+    console.log( parser.getParsedString())
     if (!command) throw new Error("Command not found")
 
     switch (command.toUpperCase()){
