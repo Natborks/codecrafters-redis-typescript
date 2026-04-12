@@ -59,6 +59,7 @@ function handleSetCacheOptions(key: string, options: string[]) {
   const interval = parseInt(delay)
   setTimeout(() => {
     cache.delete(key)
+    console.log(cache)
   }, interval)
 
   console.log(cache)
