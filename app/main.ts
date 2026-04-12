@@ -27,7 +27,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "GET":
         const query = args[1]
         const result = cache.get(query)
-        console.log(result, query)
         if (result) {
           connection.write(writeBulkString([result])) 
         } else {
@@ -39,6 +38,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
 });
 
 function writeBulkString(args: any) : string {
+  console.log(args)
    let response = "$"
     for (const literal of args) {
       const length = literal.length
