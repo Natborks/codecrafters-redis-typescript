@@ -21,7 +21,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         connection.write(writeBulkString(args))
         break
       case "SET":
-        console.log(args)
         const [key, value, ...options] = args
         cache.set(key, value)
         if (options) handleSetCacheOptions(options)
@@ -44,7 +43,9 @@ function writeBulkString(args: any) : string {
    let response = "$"
     for (const literal of args) {
       const length = literal.length
-      response = response.concat(`${length}\r\n${literal}\r\n`)
+      if (Number.isInteger(parseInt(literal))) {
+        response = response.concat(`${length}\r\n${literal}\r\n`)
+      }
     }
 
     return response

@@ -2,6 +2,14 @@ import { TokenType } from "../types/TokenType"
 import Scanner from "./Scanner"
 import Token from "./Token"
 
+const SIMPLE_STRING = "+"
+const ARRAY = "*"
+const BULK_STRING = "$"
+
+const SIMPLE_STRING_OFFSET = 2
+const ARRAY_OFFSET = 5
+const BULK_STRING_OFFSET = 3
+
 export default class Parser {
     #source
     #parsedData : string []
@@ -21,27 +29,27 @@ export default class Parser {
 
     private parseCommand(commandType: string, tokens: Token[], acc: string[]) : string[] {
 
-        if (commandType === "+") {
+        if (commandType === SIMPLE_STRING) {
             const command = tokens.at(1)?.lexeme
             if (command === undefined) {
                 throw new Error("Missing command token")
             }
 
-            const args = this.parseSimpleString(tokens.slice(2))
+            const args = this.parseSimpleString(tokens.slice(SIMPLE_STRING_OFFSET))
             return [command, args]
         }
 
-        if (commandType === "*") {
+        if (commandType === ARRAY) {
             const commandType = tokens.at(4)?.lexeme
             
             if(!commandType) throw new Error("Missing command token")
 
-            return this.parseCommand(commandType, tokens.slice(5), acc)
+            return this.parseCommand(commandType, tokens.slice(ARRAY_OFFSET), acc)
         }
 
-        if (commandType === "$") {
+        if (commandType === BULK_STRING) {
 
-            const result = this.parseBulkString(tokens.slice(3))
+            const result = this.parseBulkString(tokens.slice(BULK_STRING_OFFSET))
             
             return [...acc, ...result]
         }
@@ -55,11 +63,10 @@ export default class Parser {
 
     private parseSimpleString(tokens: Token[]) : string {
        for (const token of tokens) {
-            if (token.type === TokenType.STRING || token.type === TokenType.NUMBER) {
+            if (token.type === TokenType.STRING) {
                 return token.literal
             }
        } 
-
        //string part of RESP was empty 
        return ""
     }
@@ -75,7 +82,10 @@ export default class Parser {
         return result
     }
 
-
-
-
 }
+
+// const parse = new Parser("*5\r\n$3\r\nSET\r\n$9\r\npineapple\r\n$5\r\ngrape\r\n$2\r\nPX\r\n$3\r\n100\r\n")
+
+// const data = parse.getParsedString()
+
+// console.log(data)
