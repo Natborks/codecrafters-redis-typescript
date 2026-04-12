@@ -1,10 +1,10 @@
 import * as net from "net";
-import { TokenType } from "./types/TokenType";
 import Parser from "./parser/Parser";
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 
+const cache = new Map<String, any>()
 // Uncomment the code below to pass the first stage
 const server: net.Server = net.createServer((connection: net.Socket) => {
   // Handle connection
@@ -21,6 +21,10 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "ECHO":
         connection.write(writeBulkString(args))
         break
+      case "SET":
+        const [key, value] = args
+        cache.set(key, value)
+        connection.write("+OK\r\n")
     }
   })
 
