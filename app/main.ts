@@ -13,7 +13,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
   connection.on('data', (data: Buffer) => {
     const request = data.toString()
 
-    const [command, ...args] = request.split(/\s+/)
+    const [command, args] = request.split(/\s+/)
 
     if (command === 'PING') {
       return connection.write("+PONG\r\n")
@@ -25,7 +25,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
 
 
     let response = "$"
-    for (const token of args) {
+    for (const token of [...args]) {
       if (token.type === TokenType.STRING) {
         if (token.literal === "ECHO") continue
 
