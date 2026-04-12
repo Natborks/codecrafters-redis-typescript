@@ -14,6 +14,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
     const request = data.toString()
 
     const [command, args] = request.split(/\s+/)
+    console.log(args)
 
     if (command === 'PING') {
       return connection.write("+PONG\r\n")
