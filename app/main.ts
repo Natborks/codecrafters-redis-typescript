@@ -52,9 +52,21 @@ function writeBulkString(args: any) : string {
     return response
 }
 
-function setCache(args : string[]) {
+function setCache(args : string[], isArray: boolean = false) {
   const [, key, , val, ...options] = args 
-  cache.set(key, val) 
+
+  if(isArray) {
+    const existingValue = cache.get(key)
+    
+    if(existingValue) {
+      existingValue.push(val)
+    } else {
+      cache.set(key, [val])
+    }
+  } else {
+    cache.set(key, val) 
+  } 
+ 
   if (options.length > 0) handleSetCacheOptions(key, options)
 }
 function handleSetCacheOptions(key: string, options: string[]) {
