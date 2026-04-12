@@ -60,7 +60,7 @@ function handleSetCacheOptions(key: string, options: string[]) {
   setTimeout(() => {
     cache.delete(key)
     console.log(cache)
-  }, interval)
+  }, 1000)
 
   console.log(cache)
 }
