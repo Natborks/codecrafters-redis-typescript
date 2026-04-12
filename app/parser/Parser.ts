@@ -56,6 +56,7 @@ export default class Parser {
     private parseSimpleString(tokens: Token[]) : string {
        for (const token of tokens) {
             if (token.type === TokenType.STRING || token.type === TokenType.NUMBER) {
+                console.log(token.literal)
                 return token.literal
             }
        } 
