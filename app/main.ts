@@ -10,14 +10,16 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
   // Handle connection
   connection.on('data', (data: Buffer) => {
     const parser = new Parser(data.toString())
-    const [command, args] = parser.parseCommand()
-    console.log("COMMAND: ",command)
+    const command = parser.getParsedString().shift()
+    if (!command) throw new Error("Command not found")
+    const args = parser.getParsedString()
+
     switch (command.toUpperCase()){
       case "PING":
         connection.write("+PONG\r\n")
         break
       case "ECHO":
-        connection.write(writeBulkString(args as string[]))
+        connection.write(writeBulkString(args))
         break
     }
   })

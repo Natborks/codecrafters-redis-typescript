@@ -4,6 +4,7 @@ import Token from "./Token"
 
 export default class Parser {
     #source
+    #parsedData : string []
 
     constructor(source: string) {
         this.#source = source    
@@ -15,7 +16,7 @@ export default class Parser {
             throw new Error("No command type found")
         }
     
-        this.parseCommand(commandType, tokens, [])
+        this.#parsedData = this.parseCommand(commandType, tokens, [])
     }
 
     private parseCommand(commandType: string, tokens: Token[], acc: string[]) : sting[] {
@@ -46,6 +47,10 @@ export default class Parser {
         }
 
         throw new Error("Unsupported command type")
+    }
+
+    getParsedString() {
+        return this.#parsedData
     }
 
     private parseSimpleString(tokens: Token[]) : string {
