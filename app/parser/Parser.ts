@@ -19,7 +19,7 @@ export default class Parser {
         this.#parsedData = this.parseCommand(commandType, tokens, [])
     }
 
-    private parseCommand(commandType: string, tokens: Token[], acc: string[]) : sting[] {
+    private parseCommand(commandType: string, tokens: Token[], acc: string[]) : string[] {
 
         if (commandType === "+") {
             const command = tokens.at(1)?.lexeme

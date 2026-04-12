@@ -10,9 +10,8 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
   // Handle connection
   connection.on('data', (data: Buffer) => {
     const parser = new Parser(data.toString())
-    const command = parser.getParsedString().shift()
+    const [command, ...args] = parser.getParsedString()
     if (!command) throw new Error("Command not found")
-    const args = parser.getParsedString()
 
     switch (command.toUpperCase()){
       case "PING":
@@ -29,7 +28,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "GET":
         const query = args[0]
         const result = cache.get(query)
-        console.log("query ", query, "result ", result)
         if (result) {
           connection.write(writeBulkString([result])) 
         }
