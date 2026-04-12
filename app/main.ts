@@ -25,7 +25,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         connection.write("+OK\r\n")
         break
       case "GET":
-        const query = args[1]
+        const [queryLen, query] = args
         const result = cache.get(query)
         if (result) {
           connection.write(writeBulkString([result])) 
@@ -41,6 +41,7 @@ function writeBulkString(args: any) : string {
   console.log(args)
    let response = "$"
     for (const literal of args) {
+      if (Number.isInteger(parseInt(literal))) continue
       const length = literal.length
       response = response.concat(`${length}\r\n${literal}\r\n`)
     }
