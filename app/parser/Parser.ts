@@ -74,7 +74,7 @@ export default class Parser {
     private parseBulkString(tokens: Token[]) : string[] {
         const result = []
         for (const token of tokens) {
-            if (token.type === TokenType.STRING) {
+            if (token.type === TokenType.STRING || token.type === TokenType.NUMBER) {
                 result.push(token.literal)
             }
         }
