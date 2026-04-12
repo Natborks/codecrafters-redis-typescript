@@ -21,6 +21,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         connection.write(writeBulkString(args))
         break
       case "SET":
+        console.log(args)
         const [key, value, ...options] = args
         cache.set(key, value)
         if (options) handleSetCacheOptions(options)
