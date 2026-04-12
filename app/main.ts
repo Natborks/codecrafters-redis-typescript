@@ -26,7 +26,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         break
       case "GET":
         const query = args[1]
-        console.log(args)
         const result = cache.get(query)
         if (result) {
           connection.write(writeBulkString([result])) 
@@ -61,6 +60,8 @@ function handleSetCacheOptions(key: string, options: string[]) {
   setTimeout(() => {
     cache.delete(key)
   }, interval)
+
+  console.log(cache)
 }
 
 server.listen(6379, "127.0.0.1");
