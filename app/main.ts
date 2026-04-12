@@ -24,6 +24,10 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         setCache(args)
         connection.write("+OK\r\n")
         break
+      case "RPUSH":
+        setCache(args)
+        connection.write("+OK\r\n")
+        break
       case "GET":
         const [queryLen, query] = args
         const result = cache.get(query)
@@ -38,7 +42,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
 });
 
 function writeBulkString(args: any) : string {
-  console.log(args)
    let response = "$"
     for (const literal of args) {
       if (Number.isInteger(parseInt(literal))) continue
@@ -55,7 +58,6 @@ function setCache(args : string[]) {
   if (options.length > 0) handleSetCacheOptions(key, options)
 }
 function handleSetCacheOptions(key: string, options: string[]) {
-  console.log(options)
   const [, , ,delay] = options
   const interval = parseInt(delay)
   setTimeout(() => {
