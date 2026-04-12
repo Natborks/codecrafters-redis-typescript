@@ -56,7 +56,7 @@ function setCache(args : string[]) {
   if (options) handleSetCacheOptions(key, options)
 }
 function handleSetCacheOptions(key: string, options: string[]) {
-  const [, , delay] = options
+  const [, , ,delay] = options
   console.log(options)
   const interval = parseInt(delay)
   setTimeout(() => {
