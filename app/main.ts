@@ -31,7 +31,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const result = cache.get(query)
         console.log("query ", query, "result ", result)
         if (result) {
-          connection.write(writeBulkString(result)) 
+          connection.write(writeBulkString([...result])) 
         }
     }
   })
