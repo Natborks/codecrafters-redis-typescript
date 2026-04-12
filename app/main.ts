@@ -22,7 +22,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         break
       case "SET":
         setCache(args)
-        connection.write("+OK\r\n")
+        connection.write(":1\r\n")
         break
       case "RPUSH":
         setCache(args)
