@@ -23,7 +23,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "SET":
         const [key, value, ...options] = args
         cache.set(key, value)
-        if (options) handleSetCacheOptions(options)
+        if (options) handleSetCacheOptions(key, options)
         connection.write("+OK\r\n")
         break
       case "GET":
@@ -51,8 +51,12 @@ function writeBulkString(args: any) : string {
     return response
 }
 
-function handleSetCacheOptions(options: string[]) {
-  console.log(options)
+function handleSetCacheOptions(key: string, options: string[]) {
+  const [, , delay] = options
+  const interval = parseInt(delay)
+  setTimeout(() => {
+    cache.delete(key)
+  }, interval)
 }
 
 server.listen(6379, "127.0.0.1");
