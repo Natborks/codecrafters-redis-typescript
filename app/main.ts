@@ -38,7 +38,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
 
 });
 
-function writeBulkString(args: string[]) : string {
+function writeBulkString(args: any) : string {
    let response = "$"
     for (const literal of args) {
       const length = literal.length
