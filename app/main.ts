@@ -51,7 +51,7 @@ function writeBulkString(args: any) : string {
 function setCache(args : string[]) {
   const [, key, , val, ...options] = args 
   cache.set(key, val) 
-  if (options) handleSetCacheOptions(key, options)
+  if (options.length > 0) handleSetCacheOptions(key, options)
 }
 function handleSetCacheOptions(key: string, options: string[]) {
   console.log(options)
