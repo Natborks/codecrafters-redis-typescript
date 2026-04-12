@@ -11,7 +11,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
   connection.on('data', (data: Buffer) => {
     const parser = new Parser(data.toString())
     const [command, ...args] = parser.getParsedString()
-    console.log( parser.getParsedString())
     if (!command) throw new Error("Command not found")
 
     switch (command.toUpperCase()){
@@ -22,13 +21,11 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         connection.write(writeBulkString(args))
         break
       case "SET":
-        const [key, value, ...options] = args
-        cache.set(key, value)
-        if (options) handleSetCacheOptions(key, options)
+        setCache(args)
         connection.write("+OK\r\n")
         break
       case "GET":
-        const query = args[0]
+        const query = args[1]
         const result = cache.get(query)
         if (result) {
           connection.write(writeBulkString([result])) 
@@ -52,8 +49,12 @@ function writeBulkString(args: any) : string {
     return response
 }
 
+function setCache(args : string[]) {
+  const [, key, , val, ...options] = args 
+  cache.set(key, val) 
+  if (options) handleSetCacheOptions(key, options)
+}
 function handleSetCacheOptions(key: string, options: string[]) {
-  console.log(options)
   const [, , delay] = options
   const interval = parseInt(delay)
   setTimeout(() => {
