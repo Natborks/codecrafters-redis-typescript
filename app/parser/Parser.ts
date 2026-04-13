@@ -58,7 +58,15 @@ export default class Parser {
     }
 
     getParsedString() {
-        return this.#parsedData
+        const tokens = this.#parsedData
+        const result = [[tokens[0].length, tokens[0]]]
+        for (let i = 1; i < tokens.length; i += 2) {
+            const len = tokens[i - 1];
+            const lexeme = tokens[i];
+
+            result.push([len, lexeme])
+        }
+        return result
     }
 
     private parseSimpleString(tokens: Token[]) : string {
@@ -79,14 +87,13 @@ export default class Parser {
             }
         }
 
-        for (let i = 1; i < tokens.length; i += 2) {
-            const len = tokens[i - 1].literal;
-            const literal = tokens[i].literal;
-
-            console.log([len, literal])
-        }
-
         return result
     }
 
 }
+
+const parse = new Parser("*5\r\n$3\r\nSET\r\n$9\r\npineapple\r\n$5\r\ngrape\r\n$2\r\nPX\r\n$3\r\n100\r\n")
+
+const data = parse.getParsedString()
+
+console.log(data)
