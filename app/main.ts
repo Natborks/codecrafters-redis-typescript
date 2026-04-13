@@ -26,8 +26,8 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         connection.write("+OK\r\n")
         break
       case "RPUSH":
-        setCache(args)
-        connection.write(":1\r\n")
+        const count = setCache(args)
+        connection.write(`:${count}\r\n`)
         break
       case "GET":
         const [queryLen, query] = args
@@ -56,11 +56,12 @@ function writeBulkString(args: any) : string {
 function setCache(args : string[], isArray: boolean = false) {
   const [, key, , val, ...options] = args 
 
+  let count = 1
   if(isArray) {
     const existingValue = cache.get(key)
-    
     if(existingValue) {
       existingValue.push(val)
+      count = existingValue.length + 1
     } else {
       cache.set(key, [val])
     }
@@ -69,7 +70,10 @@ function setCache(args : string[], isArray: boolean = false) {
   } 
  
   if (options.length > 0) handleSetCacheOptions(key, options)
+
+  return count
 }
+
 function handleSetCacheOptions(key: string, options: string[]) {
   const [, , ,delay] = options
   const interval = parseInt(delay)
