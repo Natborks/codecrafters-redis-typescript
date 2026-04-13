@@ -19,9 +19,9 @@ export default class Cache {
       this.cache.set(key, [value]);
       count = 1;
     }
-    if (options.length > 0) {
-      this.handleSetCacheOptions(key, options);
-    }
+    // if (options.length > 0) {
+    //   this.handleSetCacheOptions(key, options);
+    // }
     return count;
   }
 
