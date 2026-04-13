@@ -8,21 +8,24 @@ export default class Cache {
     }
   }
 
-  rpush(key: string, value: any, options: string[] = []): number {
-    console.log(options)
+  rpush(key: string, values: any[], options: string[] = []): number {
+
     const existingValue = this.cache.get(key);
-    let count: number;
-    if (existingValue && Array.isArray(existingValue)) {
-      existingValue.push(value);
-      count = existingValue.length;
-    } else {
-      this.cache.set(key, [value]);
-      count = 1;
+
+    const vals = []
+    for (const val of values) {
+        if (Number.isInteger(parseInt(val))) {
+            vals.push(val)
+        }
     }
-    // if (options.length > 0) {
-    //   this.handleSetCacheOptions(key, options);
-    // }
-    return count;
+
+    if (existingValue && Array.isArray(existingValue)) {
+      existingValue.push(...vals);
+    } else {
+      this.cache.set(key, vals);
+    }
+ 
+    return vals.length;
   }
 
   get(key: string): any {
