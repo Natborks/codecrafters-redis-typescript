@@ -11,11 +11,13 @@ export default class Cache {
   rpush(key: string, values: any[], options: string[] = []): number {
 
     const existingValue = this.cache.get(key);
+    console.log(values)
 
     const vals = []
     for (const val of values) {
         if (!Number.isInteger(parseInt(val))) {
             vals.push(val)
+            console.log("val\n")
         }
     }
 
