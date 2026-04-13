@@ -50,8 +50,8 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const values = cache.lrange(key, startIdx, endIdx)
         const bulkString = writeBulkString(values) 
         console.log("BULK STRING",bulkString)
-        return `*${values.length}\r\n${bulkString}`
-        
+        connection.write(`*${values.length}\r\n${bulkString}`)
+
       }
     }
   })
