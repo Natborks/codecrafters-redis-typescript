@@ -56,13 +56,13 @@ function writeBulkString(args: any) : string {
 
 function setCache(args : string[], isArray: boolean = false) {
   const [, key, , val, ...options] = args 
-
+  console.log(args)
   let count = 1
   if(isArray) {
     const existingValue = cache.get(key)
     if(existingValue) {
       existingValue.push(val)
-      console.log(existingValue)
+      console.log("existing value: ",existingValue)
       count = existingValue.length + 1
     } else {
       cache.set(key, [val])
@@ -70,6 +70,8 @@ function setCache(args : string[], isArray: boolean = false) {
   } else {
     cache.set(key, val) 
   } 
+
+  console.log("COUNT",count )
  
   if (options.length > 0) handleSetCacheOptions(key, options)
 
