@@ -11,7 +11,6 @@ export default class Cache {
   rpush(key: string, values: any[], options: string[] = []): number {
 
     const existingValue = this.cache.get(key);
-    console.log(values)
 
     const vals = []
     for (const val of values) {

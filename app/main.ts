@@ -43,6 +43,9 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         }
         break
       }
+      case "LRANGE": {
+        console.log(args)
+      }
     }
   })
 
