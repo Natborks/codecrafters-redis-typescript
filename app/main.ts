@@ -23,7 +23,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         break
       case "SET": {
         const [, key, ,...values] = args;
-        
+        console.log(args)
         cache.set(key, values);
         connection.write("+OK\r\n")
         break
