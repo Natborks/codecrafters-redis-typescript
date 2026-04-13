@@ -28,8 +28,8 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         break
       }
       case "RPUSH": {
-        const [, key,...values] = args;
-        const count = cache.rpush(key, values);
+        const [, key, ...values] = args;
+        const count = cache.rpush(key, values.slice(2));
         connection.write(`:${count}\r\n`)
         break
       }
