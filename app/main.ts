@@ -13,7 +13,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
     const [command, ...args] = parser.getParsedString()
     if (!command) throw new Error("Command not found")
     
-    console.log(command)
     
     switch (command[1].toUpperCase()){
       case "PING":

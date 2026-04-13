@@ -58,15 +58,16 @@ export default class Parser {
     }
 
     getParsedString() {
-        const [commandLen, command, tokens] = this.#parsedData
-        const result = [[commandLen, command]]
-        for (let i = 1; i < tokens.length; i += 2) {
-            const len = tokens[i - 1];
-            const lexeme = tokens[i];
+        // console.log(this.#parsedData)
+        // const [command, ...tokens] = this.#parsedData
+        // const result : [string | string[]]= [command]
+        // for (let i = 1; i < tokens.length; i += 2) {
+        //     const len = tokens[i - 1];
+        //     const lexeme = tokens[i];
 
-            result.push([len, lexeme])
-        }
-        return result
+        //     result.push([len, lexeme])
+        // }
+        return this.#parsedData
     }
 
     private parseSimpleString(tokens: Token[]) : string {
