@@ -75,6 +75,8 @@ function writeArrayString(args: string[]) : any[] {
     response.concat(writeBulkString(val))
   }
 
+  console.log(response)
+
   return response
 }
 
