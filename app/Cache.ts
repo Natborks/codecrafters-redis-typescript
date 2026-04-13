@@ -43,7 +43,7 @@ export default class Cache {
         result.push(values[i])
     }
 
-    return values
+    return result
   }
 
   private handleSetCacheOptions(key: string, options: string[]) {
