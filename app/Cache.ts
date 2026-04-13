@@ -17,7 +17,6 @@ export default class Cache {
     for (const val of values) {
         if (!Number.isInteger(parseInt(val))) {
             vals.push(val)
-            console.log(val)
         }
     }
 
@@ -37,14 +36,10 @@ export default class Cache {
 
   lrange(key: string, startIdx: number, endIdx: number) : string[]{
     const values = this.cache.get(key)
-    console.log(values)
     const result: string[] = []
     for (let i = startIdx; i <= endIdx; i+=1) {
-        console.log(i, values[i])
         result.push(values[i])
     }
-
-    console.log(result)
 
     return result
   }
