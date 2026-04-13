@@ -62,7 +62,7 @@ function setCache(args : string[], isArray: boolean = false) {
     if(existingValue && existingValue.length > 0) {
       existingValue.push(val)
       console.log("existing value: ",existingValue)
-      count = existingValue.length + 1
+      count = existingValue.length
     } else {
       cache.set(key, [val])
     }
