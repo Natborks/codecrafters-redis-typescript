@@ -39,7 +39,7 @@ export default class Cache {
     const values = this.cache.get(key)
     console.log(values)
     const result: string[] = []
-    for (let i = startIdx; i < endIdx; i+=1) {
+    for (let i = startIdx; i <= endIdx; i+=1) {
         console.log(i, values[i])
         result.push(values[i])
     }
