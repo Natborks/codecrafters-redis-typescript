@@ -14,7 +14,7 @@ export default class Cache {
 
     const vals = []
     for (const val of values) {
-        if (Number.isInteger(parseInt(val))) {
+        if (!Number.isInteger(parseInt(val))) {
             vals.push(val)
         }
     }
