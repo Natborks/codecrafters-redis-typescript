@@ -66,6 +66,8 @@ function writeBulkString(args: any) : string {
       response = response.concat(`${length}\r\n${literal}\r\n`)
     }
 
+    console.log("RESPONSE: ", response)
+
     return response
 }
 
