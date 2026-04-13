@@ -9,6 +9,7 @@ export default class Cache {
   }
 
   rpush(key: string, value: any, options: string[] = []): number {
+    console.log(options)
     const existingValue = this.cache.get(key);
     let count: number;
     if (existingValue && Array.isArray(existingValue)) {
