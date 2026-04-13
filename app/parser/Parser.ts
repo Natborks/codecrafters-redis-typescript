@@ -93,8 +93,8 @@ export default class Parser {
 
 }
 
-const parse = new Parser("*5\r\n$3\r\nSET\r\n$9\r\npineapple\r\n$5\r\ngrape\r\n$2\r\nPX\r\n$3\r\n100\r\n")
+// const parse = new Parser("*5\r\n$3\r\nSET\r\n$9\r\npineapple\r\n$5\r\ngrape\r\n$2\r\nPX\r\n$3\r\n100\r\n")
 
-const data = parse.getParsedString()
+// const data = parse.getParsedString()
 
-console.log(data)
+// console.log(data)
