@@ -25,8 +25,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         connection.write("+OK\r\n")
         break
       case "RPUSH":
-        console.log(args, true)
-        const count = setCache(args)
+        const count = setCache(args, true)
         connection.write(`:${count}\r\n`)
         break
       case "GET":
