@@ -48,8 +48,10 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const startIdx = parseInt(args[3])
         const endIdx = parseInt(args[5])
         const values = cache.lrange(key, startIdx, endIdx)
-        console.log(writeBulkString(values)) 
-        return `*${values.length}\r\n${writeBulkString(values)}`
+        const bulkString = writeBulkString(values) 
+        console.log("BULK STRING",bulkString)
+        return `*${values.length}\r\n${bulkString}`
+        
       }
     }
   })
