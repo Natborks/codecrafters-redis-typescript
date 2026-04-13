@@ -27,7 +27,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "RPUSH":
         console.log(args, true)
         const count = setCache(args)
-        console.log(count)
         connection.write(`:${count}\r\n`)
         break
       case "GET":
@@ -60,6 +59,7 @@ function setCache(args : string[], isArray: boolean = false) {
   let count = 1
   if(isArray) {
     const existingValue = cache.get(key)
+    console.log(existingValue)
     if(existingValue.length > 0) {
       existingValue.push(val)
       console.log("existing value: ",existingValue)
