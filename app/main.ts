@@ -47,7 +47,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const key = args[1]
         const startIdx = parseInt(args[3])
         const endIdx = parseInt(args[5])
-        console.log(key, startIdx, endIdx)
         const values = cache.lrange(key, startIdx, endIdx)
         console.log(writeBulkString(values)) 
         return `*${values.length}\r\n${writeBulkString(values)}`
@@ -61,7 +60,6 @@ function writeBulkString(args: any) : string {
    let response = "$"
     for (const literal of args) {
       if (Number.isInteger(parseInt(literal))) continue
-      console.log(literal)
       const length = literal.length
       response = response.concat(`${length}\r\n${literal}\r\n`)
     }
