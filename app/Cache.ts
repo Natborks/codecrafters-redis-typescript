@@ -35,7 +35,7 @@ export default class Cache {
     return this.cache.get(key);
   }
 
-  lrange(key: string, startIdx: string, endIdx: string) : string[]{
+  lrange(key: string, startIdx: number, endIdx: number) : string[]{
     const values = this.cache.get(key)
     console.log(values)
     const result: string[] = []
