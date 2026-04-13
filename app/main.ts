@@ -44,7 +44,13 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         break
       }
       case "LRANGE": {
-        console.log(args)
+        const key = args[1]
+        const startIdx = args[3]
+        const endIdx = args[5]
+
+        const values = cache.lrange(key, startIdx, endIdx)
+        
+        return `*${values.length}\r\n${writeBulkString(values)}`
       }
     }
   })

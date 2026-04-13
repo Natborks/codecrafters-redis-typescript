@@ -1,4 +1,5 @@
 export default class Cache {
+
   private cache: Map<string, any> = new Map();
 
   set(key: string, value: any, options: string[] = []) {
@@ -32,6 +33,17 @@ export default class Cache {
 
   get(key: string): any {
     return this.cache.get(key);
+  }
+
+  lrange(key: string, startIdx: string, endIdx: string) : string[]{
+    const values = this.cache.get(key)
+
+    const result: string[] = []
+    for (let i = startIdx; i < endIdx; i+=1) {
+        result.push(values[i])
+    }
+
+    return values
   }
 
   private handleSetCacheOptions(key: string, options: string[]) {
