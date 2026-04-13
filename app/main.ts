@@ -66,9 +66,16 @@ function writeBulkString(args: any) : string {
       response = response.concat(`${length}\r\n${literal}\r\n`)
     }
 
-    console.log("RESPONSE: ", response)
-
     return response
+}
+
+function writeArrayString(args: string[]) : any[] {
+  const response : any[] = []
+  for (const val of args) {
+    response.concat(writeBulkString(val))
+  }
+
+  return response
 }
 
 server.listen(6379, "127.0.0.1");
