@@ -58,8 +58,8 @@ export default class Parser {
     }
 
     getParsedString() {
-        const tokens = this.#parsedData
-        const result = [[tokens[0].length, tokens[0]]]
+        const [commandLen, command, tokens] = this.#parsedData
+        const result = [[commandLen, command]]
         for (let i = 1; i < tokens.length; i += 2) {
             const len = tokens[i - 1];
             const lexeme = tokens[i];
