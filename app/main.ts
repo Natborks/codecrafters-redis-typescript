@@ -49,7 +49,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const endIdx = args[5]
 
         const values = cache.lrange(key, startIdx, endIdx)
-        
+        console.log(values) 
         return `*${values.length}\r\n${writeBulkString(values)}`
       }
     }
