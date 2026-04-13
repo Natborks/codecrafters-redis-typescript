@@ -1,10 +1,11 @@
 import * as net from "net";
 import Parser from "./parser/Parser";
+import Cache from "./Cache";
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 
-const cache = new Map<String, any>()
+const cache = new Cache()
 // Uncomment the code below to pass the first stage
 const server: net.Server = net.createServer((connection: net.Socket) => {
   // Handle connection
@@ -20,22 +21,28 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "ECHO":
         connection.write(writeBulkString(args))
         break
-      case "SET":
-        setCache(args)
+      case "SET": {
+        const [, key, , val, ...options] = args;
+        cache.set(key, val, options);
         connection.write("+OK\r\n")
         break
-      case "RPUSH":
-        const count = setCache(args, true)
+      }
+      case "RPUSH": {
+        const [, key, , val, ...options] = args;
+        const count = cache.rpush(key, val, options);
         connection.write(`:${count}\r\n`)
         break
-      case "GET":
-        const [queryLen, query] = args
-        const result = cache.get(query)
+      }
+      case "GET": {
+        const [, query] = args;
+        const result = cache.get(query);
         if (result) {
           connection.write(writeBulkString([result])) 
         } else {
           connection.write("$-1\r\n")
         }
+        break
+      }
     }
   })
 
@@ -50,40 +57,6 @@ function writeBulkString(args: any) : string {
     }
 
     return response
-}
-
-function setCache(args : string[], isArray: boolean = false) {
-  const [, key, , val, ...options] = args 
-  console.log(args, isArray)
-  let count = 1
-  if(isArray) {
-    const existingValue = cache.get(key)
-    console.log("EXISTING: ", existingValue)
-    if(existingValue && existingValue.length > 0) {
-      existingValue.push(val)
-      console.log("existing value: ",existingValue)
-      count = existingValue.length
-    } else {
-      cache.set(key, [val])
-    }
-  } else {
-    cache.set(key, val) 
-  } 
-
-  console.log("COUNT",count )
- 
-  if (options.length > 0) handleSetCacheOptions(key, options)
-
-  return count
-}
-
-function handleSetCacheOptions(key: string, options: string[]) {
-  const [, , ,delay] = options
-  const interval = parseInt(delay)
-  setTimeout(() => {
-    cache.delete(key)
-  }, interval)
-
 }
 
 server.listen(6379, "127.0.0.1");
