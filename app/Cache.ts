@@ -43,6 +43,8 @@ export default class Cache {
         result.push(values[i])
     }
 
+    console.log(result)
+
     return result
   }
 
