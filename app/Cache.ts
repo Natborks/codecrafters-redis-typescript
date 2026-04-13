@@ -17,7 +17,7 @@ export default class Cache {
     for (const val of values) {
         if (!Number.isInteger(parseInt(val))) {
             vals.push(val)
-            console.log("val\n")
+            console.log(val)
         }
     }
 
