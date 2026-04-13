@@ -23,9 +23,10 @@ export default class Cache {
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.push(...vals);
-    } else {
-      this.cache.set(key, vals);
-    }
+      return existingValue.length
+    } 
+    
+    this.cache.set(key, vals);
  
     return vals.length;
   }
