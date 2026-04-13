@@ -22,15 +22,14 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         connection.write(writeBulkString(args))
         break
       case "SET": {
-        const [, key, ,...values] = args;
-        console.log(args)
-        cache.set(key, values);
+        const [, key, , val, ...options] = args;
+        cache.set(key, val, options);
         connection.write("+OK\r\n")
         break
       }
       case "RPUSH": {
-        const [, key, , val, ...options] = args;
-        const count = cache.rpush(key, val, options);
+        const [, key,...values] = args;
+        const count = cache.rpush(key, values);
         connection.write(`:${count}\r\n`)
         break
       }
