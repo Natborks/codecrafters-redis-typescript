@@ -69,13 +69,11 @@ function writeBulkString(args: any) : string {
     return response
 }
 
-function writeArrayString(args: string[]) : any[] {
-  const response : any[] = []
+function writeArrayString(args: string[]) : string {
+  let response = ""
   for (const val of args) {
-    response.concat(writeBulkString(val))
+    response += writeBulkString([val])
   }
-
-  console.log(response)
 
   return response
 }
