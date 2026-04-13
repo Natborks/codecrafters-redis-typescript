@@ -61,6 +61,7 @@ function writeBulkString(args: any) : string {
    let response = "$"
     for (const literal of args) {
       if (Number.isInteger(parseInt(literal))) continue
+      console.log(literal)
       const length = literal.length
       response = response.concat(`${length}\r\n${literal}\r\n`)
     }
