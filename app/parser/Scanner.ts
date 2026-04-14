@@ -53,6 +53,9 @@ export default class Scanner {
             case '\n':
                 this.addToken(TokenType.LF, null)
                 break
+            case '-':
+                this.extractNum()
+                break
             default:
                 throw new Error("Unexpected Character")
         }
