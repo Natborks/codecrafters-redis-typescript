@@ -49,7 +49,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const endIdx = parseInt(args[5])
         const values = cache.lrange(key, startIdx, endIdx)
         const bulkString = writeArrayString(values) 
-        console.log("BULK STRING",bulkString)
         connection.write(`*${values.length}\r\n${bulkString}`)
 
       }
