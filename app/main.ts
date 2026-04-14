@@ -35,6 +35,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       }
       case "GET": {
         const [query] = args;
+        console.log(args)
         const result = cache.get(query);
         if (result) {
           connection.write(writeBulkString([result])) 

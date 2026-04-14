@@ -86,6 +86,8 @@ export default class Parser {
         const result = []
         for (let i = 0; i < tokens.length; i+= 1) {
             const token = tokens[i]
+
+            //skip string length values
             if (token.type === TokenType.DOLLAR) {
                 i = i + 2
                 continue
