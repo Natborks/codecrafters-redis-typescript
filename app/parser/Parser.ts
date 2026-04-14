@@ -59,6 +59,7 @@ export default class Parser {
     }
 
     getParsedString() {
+        console.log("PARSEDl", this.#parsedData)
         return this.#parsedData
     }
 
@@ -93,7 +94,7 @@ export default class Parser {
 
 }
 
-const parse = new Parser("*5\r\n$3\r\nSET\r\n$9\r\npineapple\r\n$5\r\ngrape\r\n$2\r\nPX\r\n$3\r\n100\r\n")
+const parse = new Parser("*7\r\n$5\r\nRPUSH\r\n$9\r\npineapple\r\n$4\r\npear\r\n$9\r\nraspberry\r\n$6\r\norange\r\n$9\r\npineapple\r\n$5\r\ngrape\r\n")
 
 const data = parse.getParsedString()
 
@@ -105,4 +106,4 @@ cache.rpush(key, args)
 
 const values = cache.get(key)
 console.log(values)
-console.log(cache.lrange(key, 0, 1))
+console.log(cache.lrange(key, 0, -2))
