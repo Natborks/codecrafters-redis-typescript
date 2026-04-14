@@ -1,3 +1,4 @@
+import Cache from "../Cache"
 import { TokenType } from "../types/TokenType"
 import Scanner from "./Scanner"
 import Token from "./Token"
@@ -93,8 +94,14 @@ export default class Parser {
 
 }
 
-// const parse = new Parser("*5\r\n$3\r\nSET\r\n$9\r\npineapple\r\n$5\r\ngrape\r\n$2\r\nPX\r\n$3\r\n100\r\n")
+const parse = new Parser("*5\r\n$3\r\nSET\r\n$9\r\npineapple\r\n$5\r\ngrape\r\n$2\r\nPX\r\n$3\r\n100\r\n")
 
-// const data = parse.getParsedString()
+const data = parse.getParsedString()
 
-// console.log(data)
+const cache = new Cache()
+const [command,,key, ...args] = data
+cache.rpush(key, args)
+
+const values = cache.get(key)
+console.log(values)
+console.log(cache.lrange("somekey", 0, 3))

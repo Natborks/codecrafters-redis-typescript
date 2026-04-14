@@ -45,6 +45,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       }
       case "LRANGE": {
         const key = args[1]
+        console.log("LRANGE")
         const startIdx = parseInt(args[3])
         const endIdx = parseInt(args[5])
         console.log(startIdx, endIdx)
