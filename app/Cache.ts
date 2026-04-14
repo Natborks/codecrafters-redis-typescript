@@ -9,7 +9,7 @@ export default class Cache {
     }
   }
 
-  rpush(key: string, values: any[], options: string[] = []): number {
+  rpush(key: string, values: any[]): number {
 
     const existingValue = this.cache.get(key);
 
