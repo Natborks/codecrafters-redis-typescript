@@ -10,14 +10,11 @@ export default class Cache {
   }
 
   rpush(key: string, values: any[]): number {
-
     const existingValue = this.cache.get(key);
 
     const vals = []
     for (const val of values) {
-        if (!Number.isInteger(parseInt(val))) {
-            vals.push(val)
-        }
+      vals.push(val)
     }
 
     if (existingValue && Array.isArray(existingValue)) {
@@ -34,12 +31,16 @@ export default class Cache {
     return this.cache.get(key);
   }
 
-  lrange(key: string, startIdx: number, endIdx: number) : string[]{
-    if (startIdx > endIdx) return []
-
+  lrange(key: string, rawStartIdx: number, rawEndIdx: number) : string[]{
+    
     if (!this.cache.has(key)) return []
     const values = this.cache.get(key)
     
+    
+    let [startIdx, endIdx] = this.normalizeIndices(rawStartIdx, rawEndIdx, values)
+
+    if (startIdx > endIdx) return []
+
     if (values.length == 0 || startIdx > values.length - 1) return []
     
     if (endIdx >= values.length) endIdx = values.length - 1
@@ -58,5 +59,14 @@ export default class Cache {
     setTimeout(() => {
       this.cache.delete(key);
     }, interval);
+  }
+
+  private normalizeIndices(startIdx: number, endIdx: number, values: any[]) : number[] {
+     startIdx = startIdx >= 0 ? startIdx : Math.max(0, startIdx + values.length)
+
+     endIdx = endIdx >= 0 ? endIdx : Math.max(0, endIdx + values.length)
+
+     console.log(startIdx, endIdx)
+     return [startIdx, endIdx]
   }
 }

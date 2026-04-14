@@ -59,16 +59,6 @@ export default class Parser {
     }
 
     getParsedString() {
-        // console.log(this.#parsedData)
-        // const [command, ...tokens] = this.#parsedData
-        // const result : [string | string[]]= [command]
-        // for (let i = 1; i < tokens.length; i += 2) {
-        //     const len = tokens[i - 1];
-        //     const lexeme = tokens[i];
-
-        //     result.push([len, lexeme])
-        // }
-        console.log("PARSED", this.#parsedData)
         return this.#parsedData
     }
 
@@ -109,9 +99,10 @@ const data = parse.getParsedString()
 
 console.log(data)
 const cache = new Cache()
-const [command,,key, ...args] = data
+const [command, key, ...args] = data
+console.log(command, "KEY", key, args)
 cache.rpush(key, args)
 
 const values = cache.get(key)
 console.log(values)
-console.log(cache.lrange("somekey", 0, 3))
+console.log(cache.lrange(key, 0, 1))
