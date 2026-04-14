@@ -53,7 +53,7 @@ export default class Cache {
   }
 
   private handleSetCacheOptions(key: string, options: string[]) {
-    const [, , , delay] = options;
+    const [, delay] = options;
     const interval = parseInt(delay);
     setTimeout(() => {
       this.cache.delete(key);
