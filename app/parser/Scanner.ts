@@ -99,7 +99,7 @@ export default class Scanner {
     }
 
     private isAlpha(c: string) : boolean {
-       return /[A-Za-z]/.test(c) 
+       return /[A-Za-z_]/.test(c) 
     }
      
     private isNum(c: string): boolean {
