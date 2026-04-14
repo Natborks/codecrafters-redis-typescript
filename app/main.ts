@@ -13,6 +13,8 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
     const parser = new Parser(data.toString())
     const [command, ...args] = parser.getParsedString()
     if (!command) throw new Error("Command not found")
+
+      console.log(command, args)
     
     switch (command.toUpperCase()){
       case "PING":
@@ -46,7 +48,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         break
       }
       case "LRANGE": {
-        console.log("LRANGE")
         const [key, startIdx, endIdx] = args
         const values = cache.lrange(key, parseInt(startIdx), parseInt(endIdx))
         const bulkString = writeArrayString(values)
