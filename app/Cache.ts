@@ -37,9 +37,11 @@ export default class Cache {
   lrange(key: string, startIdx: number, endIdx: number) : string[]{
     if (startIdx > endIdx) return []
 
+    if (!this.cache.has(key)) return []
+
     const values = this.cache.get(key)
     
-    if (!values || values.length == 0 || startIdx > values.length - 1) return []
+    if (values.length == 0 || startIdx > values.length - 1) return []
     
     if (endIdx >= values.length) endIdx = values.length - 1
 
