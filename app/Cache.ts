@@ -65,7 +65,6 @@ export default class Cache {
 
      endIdx = endIdx >= 0 ? endIdx : Math.max(0, endIdx + values.length)
 
-     console.log(startIdx, endIdx)
      return [startIdx, endIdx]
   }
 }

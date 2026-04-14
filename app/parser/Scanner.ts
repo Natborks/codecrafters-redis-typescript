@@ -18,7 +18,6 @@ export default class Scanner {
             this.#start = this.#current
             this.scanToken()
         }
-        console.log("SCANNED: ", this.#tokens)
         return this.#tokens
     } 
 
