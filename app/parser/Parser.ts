@@ -84,7 +84,13 @@ export default class Parser {
 
     private parseBulkString(tokens: Token[]) : string[] {
         const result = []
-        for (const token of tokens) {
+        for (let i = 0; i < tokens.length; i+= 1) {
+            const token = tokens[i]
+            if (token.type === TokenType.DOLLAR) {
+                i = i + 2
+                continue
+            }
+
             if (token.type === TokenType.STRING || token.type === TokenType.NUMBER) {
                 result.push(token.literal)
             }
@@ -99,6 +105,7 @@ const parse = new Parser("*5\r\n$3\r\nSET\r\n$9\r\npineapple\r\n$5\r\ngrape\r\n$
 
 const data = parse.getParsedString()
 
+console.log(data)
 const cache = new Cache()
 const [command,,key, ...args] = data
 cache.rpush(key, args)

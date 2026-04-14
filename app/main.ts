@@ -14,8 +14,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
     const [command, ...args] = parser.getParsedString()
     if (!command) throw new Error("Command not found")
     
-    console.log("ARGS_MAIN: ", args)
-    
     switch (command.toUpperCase()){
       case "PING":
         connection.write("+PONG\r\n")
@@ -24,13 +22,13 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         connection.write(writeBulkString(args))
         break
       case "SET": {
-        const [, key, , val, ...options] = args;
+        const [key, val, ...options] = args;
         cache.set(key, val, options);
         connection.write("+OK\r\n")
         break
       }
       case "RPUSH": {
-        const [, key, ...values] = args;
+        const [key, ...values] = args;
         const count = cache.rpush(key, values);
         connection.write(`:${count}\r\n`)
         break
@@ -46,25 +44,16 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         break
       }
       case "LRANGE": {
-        console.log("LRANGE ARGS: ", args)
-        const key = args[1]
-        console.log("LRANGE")
-        const startIdx = parseInt(args[3])
-        const endIdx = parseInt(args[5])
-        console.log(startIdx, endIdx)
-        const values = cache.lrange(key, startIdx, endIdx)
-        console.log(values)
-        const bulkString = writeArrayString(values) 
+        const [key, startIdx, endIdx] = args
+        const values = cache.lrange(key, parseInt(startIdx), parseInt(endIdx))
+        const bulkString = writeArrayString(values)
         connection.write(`*${values.length}\r\n${bulkString}`)
-
       }
     }
   })
-
 });
 
 function writeBulkString(args: any) : string {
-  console.log("Write bulk string: ", args)
    let response = "$"
     for (const literal of args) {
       if (Number.isInteger(parseInt(literal))) continue
@@ -76,7 +65,6 @@ function writeBulkString(args: any) : string {
 }
 
 function writeArrayString(args: string[]) : string {
-  console.log("write Array ARGS", args)
   let response = ""
   for (const val of args) {
     response += writeBulkString([val])
