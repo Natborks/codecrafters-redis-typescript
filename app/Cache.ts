@@ -36,7 +36,6 @@ export default class Cache {
     if (!this.cache.has(key)) return []
     const values = this.cache.get(key)
     
-    
     let [startIdx, endIdx] = this.normalizeIndices(rawStartIdx, rawEndIdx, values)
 
     if (startIdx > endIdx) return []
