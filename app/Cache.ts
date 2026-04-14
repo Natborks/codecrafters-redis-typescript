@@ -38,6 +38,8 @@ export default class Cache {
     const values = this.cache.get(key)
     if (!values || values.length == 0) return []
     
+    if (endIdx >= values.length) return []
+    
     const result: string[] = []
     for (let i = startIdx; i <= endIdx; i+=1) {
         result.push(values[i])
