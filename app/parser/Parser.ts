@@ -68,6 +68,7 @@ export default class Parser {
 
         //     result.push([len, lexeme])
         // }
+        console.log("PARSED", this.#parsedData)
         return this.#parsedData
     }
 
