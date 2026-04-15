@@ -27,6 +27,25 @@ export default class Cache {
     return vals.length;
   }
 
+  lpush(key: string, values: any[]) : number {
+    const existingValue = this.cache.get(key)
+
+    const vals = []
+    const iters = values.length
+    for (let i = iters; i > 0; i -= 1) {
+      vals.push(values.pop())
+    }
+
+    if (existingValue && Array.isArray(existingValue)) {
+      existingValue.push(...vals)
+      return existingValue.length
+    }
+
+    this.cache.set(key, vals)
+
+    return vals.length
+  }
+
   get(key: string): any {
     return this.cache.get(key);
   }

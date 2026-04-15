@@ -33,6 +33,12 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         connection.write(`:${count}\r\n`)
         break
       }
+      case "LPUSH": {
+        const [key, ...values] = args
+        const count = cache.lpush(key, values)
+        connection.write(`${count}`)
+        break;
+      }
       case "GET": {
         const [query] = args;
         const result = cache.get(query);
