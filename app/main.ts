@@ -66,7 +66,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const [key, numItems] = args
         const elem = cache.lpop(key, parseInt(numItems))
         if (elem) {
-          connection.write(writeBulkString(elem))
+          connection.write(writeArrayString(elem))
         } else {
           connection.write("$-1\r\n") 
         }
