@@ -88,7 +88,7 @@ function writeBulkString(args: any) : string {
 }
 
 function writeArrayString(args: string[]) : string {
-  
+  console.log("ARGS: ", args)
   let response = ""
   for (const val of args) {
     response += writeBulkString([val])
