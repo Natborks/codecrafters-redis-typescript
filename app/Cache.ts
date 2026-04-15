@@ -31,7 +31,7 @@ export default class Cache {
     const existingValue = this.cache.get(key)
 
     const vals = []
-    for (let i = values.length; i < values.length; i += 1) {
+    for (let i = 0; i < values.length; i += 1) {
       vals.unshift(values[i])
     }
 
