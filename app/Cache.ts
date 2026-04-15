@@ -83,7 +83,7 @@ export default class Cache {
       result.push(elem)
     }
 
-
+    console.log(count, result)
     return result
   }
 
