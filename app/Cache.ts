@@ -70,6 +70,14 @@ export default class Cache {
     return result
   }
 
+  llen(key: string) : number {
+    const values = this.cache.get(key)
+
+    if (!values) return 0
+
+    return values.length
+  }
+
   private handleSetCacheOptions(key: string, options: string[]) {
     const [, delay] = options;
     const interval = parseInt(delay);
