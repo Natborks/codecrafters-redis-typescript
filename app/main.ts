@@ -77,7 +77,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
   })
 });
 
-function writeBulkString(args: ) : string {
+function writeBulkString(args: string[]) : string {
    let response = "$"
     for (const literal of args) {
       const length = literal.length
@@ -90,7 +90,7 @@ function writeBulkString(args: ) : string {
 function writeArrayString(args: string[]) : string {
   console.log("ARGS: ", args)
 
-  const response = writeBulkString(...args)
+  const response = writeBulkString(args)
   console.log("RESPONSE: ",response)
   return `*${response.length}\r\n${response}`
 }
