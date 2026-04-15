@@ -94,7 +94,7 @@ function writeArrayString(args: string[]) : string {
     response += writeBulkString([val])
   }
 
-  
+  console.log("RESPONSE: ",response)
   return `*${response.length}\r\n${response}`
 }
 
