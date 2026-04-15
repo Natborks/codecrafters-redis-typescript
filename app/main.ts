@@ -90,7 +90,7 @@ function writeBulkString(args: ) : string {
 function writeArrayString(args: string[]) : string {
   console.log("ARGS: ", args)
 
-  const response = writeBulkString(args)
+  const response = writeBulkString(...args)
   console.log("RESPONSE: ",response)
   return `*${response.length}\r\n${response}`
 }
