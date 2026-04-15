@@ -63,8 +63,8 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         break 
       }
       case "LPOP": {
-        const [key] = args
-        const elem = cache.lpop(key)
+        const [key, numItems] = args
+        const elem = cache.lpop(key, parseInt(numItems))
         if (elem) {
           connection.write(writeBulkString(elem))
         } else {
