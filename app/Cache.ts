@@ -70,7 +70,7 @@ export default class Cache {
     return result
   }
 
-  lpop(key: string, count = 0) : any[] | null {
+  lpop(key: string, count = 1) : any[] | null {
     const values = this.cache.get(key)
 
     if (!values) return null

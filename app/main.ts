@@ -64,11 +64,11 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       }
       case "LPOP": {
         const [key, numItems] = args
+        console.log(numItems)
         const elem = cache.lpop(key, parseInt(numItems))
         if (elem) {
           const arrayString = writeArrayString(elem)
           console.log("Array String: ", arrayString)
-          connection.write(arrayString)
         } else {
           connection.write("$-1\r\n") 
         }
