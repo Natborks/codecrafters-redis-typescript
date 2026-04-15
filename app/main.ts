@@ -92,7 +92,7 @@ function writeArrayString(args: string[]) : string {
 
   const response = writeBulkString(args)
   console.log("RESPONSE: ",response)
-  return `*${response.length}\r\n${response}`
+  return `*${args.length}\r\n${response}`
 }
 
 server.listen(6379, "127.0.0.1");
