@@ -32,8 +32,8 @@ export default class Cache {
 
     const vals = []
     const iters = values.length
-    for (let i = iters; i > 0; i -= 1) {
-      vals.unshift(values.pop())
+    for (let i = iters; i > values.length; i -= 1) {
+      vals.unshift(values[i])
     }
 
     if (existingValue && Array.isArray(existingValue)) {
