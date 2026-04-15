@@ -75,10 +75,12 @@ export default class Cache {
 
     if (!values) return null
 
+    if (count > values.length) return values
+
     const result = []
     for (let i = 0; i < count; i+= 1) {
       const elem = values.shift()
-      result.unshift(elem)
+      result.push(elem)
     }
 
 
