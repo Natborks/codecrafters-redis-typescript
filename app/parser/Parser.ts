@@ -101,8 +101,8 @@ console.log(data)
 const cache = new Cache()
 const [command, key, ...args] = data
 console.log(command, "KEY", key, args)
-cache.lpush(key, args)
-
+const inserted = cache.lpush(key, args)
+console.log("INSERTED", inserted)
 const values = cache.get(key)
 console.log(values)
 console.log(cache.lrange(key, 0, -2))
