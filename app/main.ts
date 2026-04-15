@@ -66,9 +66,9 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const [key, numItems] = args
         const elem = cache.lpop(key, parseInt(numItems))
         if (elem) {
-          const bulkString = writeArrayString(elem)
-          console.log(elem)
-          connection.write(`*${bulkString.length}\r\n${bulkString}`)
+          const arrayString = writeArrayString(elem)
+          console.log("Array String: ", arrayString)
+          connection.write(arrayString)
         } else {
           connection.write("$-1\r\n") 
         }
@@ -94,8 +94,8 @@ function writeArrayString(args: string[]) : string {
     response += writeBulkString([val])
   }
 
-  console.log(response)
-  return response
+  
+  return `*${response.length}\r\n${response}`
 }
 
 server.listen(6379, "127.0.0.1");
