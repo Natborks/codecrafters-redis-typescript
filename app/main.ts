@@ -60,6 +60,16 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const [key] = args
         const count = cache.llen(key)
         connection.write(`:${count}\r\n`)
+        break 
+      }
+      case "LPOP": {
+        const [key] = args
+        const elem = cache.lpop(key)
+        if (elem) {
+          connection.write(`+${elem}\r\n`)
+        } else {
+          connection.write("$-1\r\n") 
+        }
       }
     }
   })

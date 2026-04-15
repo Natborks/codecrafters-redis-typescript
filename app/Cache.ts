@@ -70,6 +70,16 @@ export default class Cache {
     return result
   }
 
+  lpop(key: string) : any | null {
+    const values = this.cache.get(key)
+
+    if (!values) return null
+
+    const elem = values.pop(0)
+
+    return elem
+  }
+
   llen(key: string) : number {
     const values = this.cache.get(key)
 
