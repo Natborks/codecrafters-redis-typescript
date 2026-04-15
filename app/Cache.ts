@@ -76,6 +76,7 @@ export default class Cache {
     if (!values) return null
 
     const elem = values.shift()
+    console.log(elem)
 
     return elem
   }
