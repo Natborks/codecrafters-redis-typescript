@@ -65,16 +65,16 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "LPOP": {
         const [key, numItems] = args
         const count = numItems === undefined ? undefined : parseInt(numItems)
-        const elem = cache.lpop(key, count)
+        const elems = cache.lpop(key, count)
         
-        if (elem === null) {
+        if (elems === null) {
           connection.write("$-1\r\n")
           break
         }
 
-        const response = elem.length === 1 ? 
-          writeBulkString(elem):
-          writeArrayString(elem)
+        const response = elems.length === 1 ? 
+          writeBulkString(elems):
+          writeArrayString(elems)
         
         connection.write(response)
         break
