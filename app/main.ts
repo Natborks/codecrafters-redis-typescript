@@ -78,10 +78,10 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
 });
 
 function writeBulkString(args: string[]) : string {
-   let response = "$"
+   let response = ""
     for (const literal of args) {
       const length = literal.length
-      response = response.concat(`${length}\r\n${literal}\r\n`)
+      response = response.concat(`$${length}\r\n${literal}\r\n`)
     }
 
     return response
