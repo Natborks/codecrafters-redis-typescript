@@ -64,8 +64,8 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       }
       case "LPOP": {
         const [key, numItems] = args
-        console.log(numItems)
-        const elem = cache.lpop(key, parseInt(numItems))
+        const count = numItems === undefined ? undefined : parseInt(numItems)
+        const elem = cache.lpop(key, count)
         if (elem) {
           console.log("ELEM", elem)
           if (elem.length === 1) { 
