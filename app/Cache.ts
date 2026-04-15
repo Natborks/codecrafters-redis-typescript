@@ -36,7 +36,7 @@ export default class Cache {
     }
 
     if (existingValue && Array.isArray(existingValue)) {
-      existingValue.push(...vals)
+      existingValue.unshift(...vals)
       return existingValue.length
     }
 
