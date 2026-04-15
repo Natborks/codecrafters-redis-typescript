@@ -70,15 +70,19 @@ export default class Cache {
     return result
   }
 
-  lpop(key: string) : any | null {
+  lpop(key: string, count = 0) : any[] | null {
     const values = this.cache.get(key)
 
     if (!values) return null
 
-    const elem = values.shift()
-    console.log(elem)
+    const result = []
+    for (let i = 0; i < count; i+= 1) {
+      const elem = values.shift()
+      result.unshift(elem)
+    }
 
-    return elem
+
+    return result
   }
 
   llen(key: string) : number {
