@@ -67,6 +67,10 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         console.log(numItems)
         const elem = cache.lpop(key, parseInt(numItems))
         if (elem) {
+          if (elem.length === 1) { 
+            const bulkString = writeBulkString(elem)
+            return connection.write(bulkString)
+          }
           const arrayString = writeArrayString(elem)
           console.log("Array String: ", arrayString)
           connection.write(arrayString)
