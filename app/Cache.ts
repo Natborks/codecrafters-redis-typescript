@@ -115,7 +115,7 @@ export default class Cache extends EventEmitter{
 
       this.requestQueue.has(key) ? 
         this.requestQueue.get(key)?.push(command) : 
-        this.requestQueue.set(key, [])
+        this.requestQueue.set(key, [command])
     }) 
    }
 
