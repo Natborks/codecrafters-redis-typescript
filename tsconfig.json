@@ -22,6 +22,9 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
+
+    //for typescript compatibility with node modules
+    "types": ["bun"]
   }
 }

@@ -1,12 +1,19 @@
-export default class Cache {
+import {EventEmitter} from 'node:events'
+
+export default class Cache extends EventEmitter{
 
   private cache: Map<string, any> = new Map();
+  private requestQueue = []
+
+  private ITEM_ADDED = 'item added'
 
   set(key: string, value: any, options: string[] = []) {
     this.cache.set(key, value);
     if (options.length > 0) {
       this.handleSetCacheOptions(key, options);
     }
+
+    this.emit(this.ITEM_ADDED, key)
   }
 
   rpush(key: string, values: any[]): number {
@@ -19,10 +26,12 @@ export default class Cache {
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.push(...vals);
+      this.emit(this.ITEM_ADDED, key)
       return existingValue.length
     } 
     
     this.cache.set(key, vals);
+    this.emit(this.ITEM_ADDED, key)
  
     return vals.length;
   }
@@ -37,10 +46,12 @@ export default class Cache {
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.unshift(...vals)
+      this.emit(this.ITEM_ADDED, key)
       return existingValue.length
     }
 
     this.cache.set(key, vals)
+    this.emit(this.ITEM_ADDED, key)
 
     return vals.length
   }
@@ -83,8 +94,25 @@ export default class Cache {
       result.push(elem)
     }
 
-    console.log(count, result)
     return result
+  }
+
+  blpop(key: string, timeout: number) : Promise<any[]> {
+    const request = new Promise<any[]>((resolve, reject) => {
+      if (this.cache.has(key)) {
+        const result = this.lpop(key) as any[]
+        return resolve(result)
+      }
+
+      this.on(this.ITEM_ADDED, (itemKey) => {
+        if (key === itemKey) {
+          const result = this.lpop(key) as any[]
+          return resolve(result)
+        }
+      })
+    })
+
+    return request
   }
 
   llen(key: string) : number {
