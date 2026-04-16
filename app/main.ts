@@ -106,8 +106,6 @@ function writeBulkString(args: string[]) : string {
 }
 
 function writeArrayString(args: string[]) : string {
-  console.log("ARGS: ", args)
-
   const response = writeBulkString(args)
   console.log("RESPONSE: ",response)
   return `*${args.length}\r\n${response}`

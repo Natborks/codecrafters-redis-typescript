@@ -5,7 +5,7 @@ import {EventEmitter} from 'node:events'
 export default class Cache extends EventEmitter{
 
   private cache: Map<string, any> = new Map();
-  private requestQueue : Map<string, () => void> = new Map()
+  private requestQueue : Map<string, Array<() => void>> = new Map()
 
   private ITEM_ADDED = 'item added'
 
@@ -109,11 +109,13 @@ export default class Cache extends EventEmitter{
     //create a new promise
    if (!this.cache.has(key)) {
     return new Promise<any[]>((resolve, reject) => {
-      const handler = () => {
+      const command = () => {
           this.blpop(key, timeout).then(resolve, reject)
       }
 
-      this.requestQueue.set(key, handler)
+      this.requestQueue.has(key) ? 
+        this.requestQueue.get(key)?.push(command) : 
+        this.requestQueue.set(key, [])
     }) 
    }
 
@@ -135,8 +137,10 @@ export default class Cache extends EventEmitter{
   private handleDataAddedEvent() {
     this.on(this.ITEM_ADDED, itemKey => {
       if (this.requestQueue.has(itemKey)) {
-        const command = this.requestQueue.get(itemKey)!
-        command()
+        const commands = this.requestQueue.get(itemKey)!
+        for (const command of commands) {
+          command()
+        } 
       } 
     })
   }
