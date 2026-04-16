@@ -135,6 +135,7 @@ export default class Cache extends EventEmitter{
   }
 
   private handleDataAddedEvent() {
+    setTimeout(() => {}, 1000)
     this.on(this.ITEM_ADDED, itemKey => {
       if (this.requestQueue.has(itemKey)) {
         const commands = this.requestQueue.get(itemKey)!
