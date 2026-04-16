@@ -1,11 +1,19 @@
+import { rejects } from 'node:assert';
+import { resolve } from 'node:dns';
 import {EventEmitter} from 'node:events'
 
 export default class Cache extends EventEmitter{
 
   private cache: Map<string, any> = new Map();
-  private requestQueue = []
+  private requestQueue : Map<string, () => void> = new Map()
 
   private ITEM_ADDED = 'item added'
+
+  constructor() {
+    super();
+
+    this.handleDataAddedEvent()
+  }
 
   set(key: string, value: any, options: string[] = []) {
     this.cache.set(key, value);
@@ -99,13 +107,21 @@ export default class Cache extends EventEmitter{
 
   blpop(key: string, timeout: number) : Promise<any[]> {
     //create a new promise
-   const requestPromise = new Promise<any[]>((resolve, reject) => {
-     resolve(["data"])
-   }) 
+   if (!this.cache.has(key)) {
+    return new Promise<any[]>((resolve, reject) => {
+      const handler = () => {
+          this.blpop(key, timeout).then(resolve, reject)
+      }
 
-   //store promise in requestMap with key 
+      this.requestQueue.set(key, handler)
+    }) 
+   }
 
-    return requestPromise
+   return new Promise((resolve, reject) => {
+      const data = this.lpop(key) as []
+      return resolve([key, ...data])
+   })
+
   }
 
   llen(key: string) : number {
@@ -114,6 +130,15 @@ export default class Cache extends EventEmitter{
     if (!values) return 0
 
     return values.length
+  }
+
+  private handleDataAddedEvent() {
+    this.on(this.ITEM_ADDED, itemKey => {
+      if (this.requestQueue.has(itemKey)) {
+        const command = this.requestQueue.get(itemKey)
+        command
+      } 
+    })
   }
 
   private handleSetCacheOptions(key: string, options: string[]) {
