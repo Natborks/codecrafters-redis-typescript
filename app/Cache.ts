@@ -135,8 +135,8 @@ export default class Cache extends EventEmitter{
   }
 
   private handleDataAddedEvent() {
-    setTimeout(() => {}, 1000)
-    this.on(this.ITEM_ADDED, itemKey => {
+    setTimeout(() => {
+ this.on(this.ITEM_ADDED, itemKey => {
       if (this.requestQueue.has(itemKey)) {
         const commands = this.requestQueue.get(itemKey)!
         for (const command of commands) {
@@ -144,6 +144,8 @@ export default class Cache extends EventEmitter{
         } 
       } 
     })
+    }, 1000)
+   
   }
 
   private handleSetCacheOptions(key: string, options: string[]) {
