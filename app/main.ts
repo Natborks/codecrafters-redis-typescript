@@ -89,7 +89,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
           connection.write(response)
         }
 
-        await func()
+        func()
       }
     }
   })
