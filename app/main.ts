@@ -81,7 +81,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       } case "BLPOP": {
         let [key, timeout] = args
         const result = await cache.blpop(key, parseInt(timeout))
-        
+        console.log("BLPOP: ", result)
         const response = writeArrayString(result)
         
         connection.write(response)
