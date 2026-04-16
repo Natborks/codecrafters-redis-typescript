@@ -3,7 +3,7 @@ import {EventEmitter} from 'node:events'
 export default class Cache extends EventEmitter{
 
   private cache: Map<string, any> = new Map();
-  private requestQueue = []
+  private waitingClients: Map<string, Array<(result: any[]) => void>> = new Map();
 
   private ITEM_ADDED = 'item added'
 
@@ -26,12 +26,12 @@ export default class Cache extends EventEmitter{
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.push(...vals);
-      this.emit(this.ITEM_ADDED, key)
+      this.checkWaitingClients(key);
       return existingValue.length
     } 
     
     this.cache.set(key, vals);
-    this.emit(this.ITEM_ADDED, key)
+    this.checkWaitingClients(key);
  
     return vals.length;
   }
@@ -46,12 +46,12 @@ export default class Cache extends EventEmitter{
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.unshift(...vals)
-      this.emit(this.ITEM_ADDED, key)
+      this.checkWaitingClients(key);
       return existingValue.length
     }
 
     this.cache.set(key, vals)
-    this.emit(this.ITEM_ADDED, key)
+    this.checkWaitingClients(key);
 
     return vals.length
   }
@@ -98,21 +98,17 @@ export default class Cache extends EventEmitter{
   }
 
   blpop(key: string, timeout: number) : Promise<any[]> {
-    const request = new Promise<any[]>((resolve, reject) => {
-      if (this.cache.has(key)) {
-        const result = this.lpop(key) as any[]
-        return resolve(result)
+    if (this.cache.has(key) && this.cache.get(key).length > 0) {
+      const result = this.lpop(key) as any[]
+      return Promise.resolve([key, ...result])
+    }
+
+    return new Promise<any[]>((resolve, reject) => {
+      if (!this.waitingClients.has(key)) {
+        this.waitingClients.set(key, [])
       }
-
-      this.on(this.ITEM_ADDED, (itemKey) => {
-        if (key === itemKey) {
-          const result = this.lpop(key) as any[]
-          return resolve(result)
-        }
-      })
+      this.waitingClients.get(key)!.push(resolve)
     })
-
-    return request
   }
 
   llen(key: string) : number {
@@ -123,12 +119,13 @@ export default class Cache extends EventEmitter{
     return values.length
   }
 
-  private handleSetCacheOptions(key: string, options: string[]) {
-    const [, delay] = options;
-    const interval = parseInt(delay);
-    setTimeout(() => {
-      this.cache.delete(key);
-    }, interval);
+  private checkWaitingClients(key: string) {
+    const waiting = this.waitingClients.get(key)
+    if (waiting && waiting.length > 0) {
+      const resolve = waiting.shift()!
+      const result = this.lpop(key) as any[]
+      resolve([key, ...result])
+    }
   }
 
   private normalizeIndices(startIdx: number, endIdx: number, values: any[]) : number[] {
