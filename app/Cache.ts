@@ -21,7 +21,9 @@ export default class Cache extends EventEmitter{
       this.handleSetCacheOptions(key, options);
     }
 
-    this.emit(this.ITEM_ADDED, key)
+    process.nextTick(() => {
+      this.emit(this.ITEM_ADDED, key)
+    })
   }
 
   rpush(key: string, values: any[]): number {
@@ -34,12 +36,16 @@ export default class Cache extends EventEmitter{
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.push(...vals);
-      this.emit(this.ITEM_ADDED, key)
+      process.nextTick(() => {
+        this.emit(this.ITEM_ADDED, key)
+      })
       return existingValue.length
     } 
     
     this.cache.set(key, vals);
-    this.emit(this.ITEM_ADDED, key)
+    process.nextTick(() => {
+      this.emit(this.ITEM_ADDED, key)
+    })
  
     return vals.length;
   }
@@ -54,12 +60,16 @@ export default class Cache extends EventEmitter{
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.unshift(...vals)
-      this.emit(this.ITEM_ADDED, key)
+      process.nextTick(() => {
+        this.emit(this.ITEM_ADDED, key)
+      })
       return existingValue.length
     }
 
     this.cache.set(key, vals)
-    this.emit(this.ITEM_ADDED, key)
+    process.nextTick(() => {
+      this.emit(this.ITEM_ADDED, key)
+    })
 
     return vals.length
   }
@@ -135,8 +145,7 @@ export default class Cache extends EventEmitter{
   }
 
   private handleDataAddedEvent() {
-    setTimeout(() => {
- this.on(this.ITEM_ADDED, itemKey => {
+    this.on(this.ITEM_ADDED, itemKey => {
       if (this.requestQueue.has(itemKey)) {
         const commands = this.requestQueue.get(itemKey)!
         for (const command of commands) {
@@ -144,8 +153,6 @@ export default class Cache extends EventEmitter{
         } 
       } 
     })
-    }, 1000)
-   
   }
 
   private handleSetCacheOptions(key: string, options: string[]) {
