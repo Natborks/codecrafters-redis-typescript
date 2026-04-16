@@ -100,12 +100,7 @@ export default class Cache extends EventEmitter{
   blpop(key: string, timeout: number) : Promise<any[]> {
     //create a new promise
    const requestPromise = new Promise<any[]>((resolve, reject) => {
-      this.on(this.ITEM_ADDED, itemKey => {
-        if (itemKey === key) {
-          const data = this.lpop(itemKey) as any[]
-          resolve(data)
-        }
-      })
+     resolve(["data"])
    }) 
 
    //store promise in requestMap with key 
