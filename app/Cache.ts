@@ -118,7 +118,7 @@ export default class Cache extends EventEmitter{
    }
 
    return new Promise((resolve, reject) => {
-      const data = this.get(key) as []
+      const data = this.lpop(key) as []
       return resolve([key, ...data])
    })
 
@@ -136,8 +136,8 @@ export default class Cache extends EventEmitter{
     this.on(this.ITEM_ADDED, async itemKey => {
       if (this.requestQueue.has(itemKey)) {
         const commands = this.requestQueue.get(itemKey)!
-        for (const command of commands) {
-          await command()
+        for await (const command of commands) {
+          command()
         } 
       } 
     })
