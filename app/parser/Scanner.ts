@@ -82,7 +82,7 @@ export default class Scanner {
     private extractNum() {
         while (!this.isAtEnd()) {
             const char = this.#source[this.#current]
-            
+
             //handle cases where token is decimal point
             if (char === '.') continue
 
