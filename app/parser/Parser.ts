@@ -1,4 +1,3 @@
-import Cache from "../Cache"
 import { TokenType } from "../types/TokenType"
 import Scanner from "./Scanner"
 import Token from "./Token"
@@ -92,20 +91,3 @@ export default class Parser {
     }
 
 }
-
-const parse = new Parser("*7\r\n$5\r\nLPUSH\r\n$9\r\npineapple\r\n$4\r\npear\r\n$9\r\nraspberry\r\n$6\r\norange\r\n$9\r\npineapple\r\n$5\r\ngrape\r\n")
-
-const data = parse.getParsedString()
-
-console.log(data)
-const cache = new Cache()
-const [command, key, ...args] = data
-console.log(command, "KEY", key, args)
-const inserted = cache.lpush(key, args)
-console.log("INSERTED", inserted)
-const values = cache.get(key)
-console.log("LPOP",cache.lpop(key))
-console.log("BLPOP: ", await cache.blpop(key, 2000))
-const insert= cache.lpush("key", args)
-console.log(values)
-console.log(cache.lrange(key, 0, -1))

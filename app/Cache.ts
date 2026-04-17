@@ -137,9 +137,6 @@ export default class Cache extends EventEmitter{
         const commands = this.requestQueue.get(itemKey)!
         const nextCommand = commands.shift()!
         nextCommand()
-        // for (const command of commands) {
-        //   command()
-        // } 
       } 
     })
   }
