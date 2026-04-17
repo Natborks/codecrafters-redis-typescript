@@ -3,7 +3,7 @@ import {EventEmitter} from 'node:events'
 export default class Cache extends EventEmitter{
 
   private cache: Map<string, any> = new Map();
-  private requestQueue : Map<string, Array<() => boolean>> = new Map()
+  private requestQueue : Map<string, Array<() => void>> = new Map()
 
   private ITEM_ADDED = 'item added'
 
@@ -109,13 +109,18 @@ export default class Cache extends EventEmitter{
     }
 
     return new Promise<string[]>(resolve => {
+      const value = this.lpop(key)
+      if (!value || value.length === 0) return false
+
       const command = () => {
-        const value = this.lpop(key)
-        if (!value || value.length === 0) return false
 
         resolve([key, ...value])
-        return true
+        return 
       }
+
+      setTimeout(() => {
+        resolve([key, ...value])
+      }, timeout)
 
       const commands = this.requestQueue.get(key) ?? []
       commands.push(command)
