@@ -4,8 +4,8 @@ import Parser from "./parser/Parser";
 export default class RedisService {
   private cache = new Cache();
 
-  parse(data: Buffer): string[] {
-    const parser = new Parser(data.toString());
+  parse(data: string): string[] {
+    const parser = new Parser(data);
     return parser.getParsedString();
   }
 
@@ -69,7 +69,7 @@ export default class RedisService {
 
   async blpop(args: string[]): Promise<string> {
     const [key, timeout] = args;
-    const result = await this.cache.blpop(key, parseInt(timeout));
+    const result = await this.cache.blpop(key, parseFloat(timeout));
     return this.writeArrayString(result);
   }
 
@@ -92,3 +92,9 @@ export default class RedisService {
     return `*${args.length}\r\n${response}`;
   }
 }
+
+const redisService = new RedisService();
+const [command, ...args] = redisService.parse("*3\r\n$5\r\nBLPOP\r\n$9\r\nraspberry\r\n$3\r\n0.1\r\n");
+console.log("running blpop with args: ", args)
+const result = await redisService.blpop(args)
+console.log(result)

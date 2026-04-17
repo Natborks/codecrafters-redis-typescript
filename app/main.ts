@@ -9,7 +9,7 @@ const redisService = new RedisService();
 const server: net.Server = net.createServer((connection: net.Socket) => {
   // Handle connection
   connection.on('data', async (data: Buffer) => {
-    const [command, ...args] = redisService.parse(data);
+    const [command, ...args] = redisService.parse(data.toString());
     if (!command) throw new Error("Command not found")
 
     switch (command.toUpperCase()){

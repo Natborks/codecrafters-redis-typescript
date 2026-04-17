@@ -105,16 +105,15 @@ export default class Cache extends EventEmitter{
   blpop(key: string, timeout: number) : Promise<string[]> {
     const value = this.lpop(key)
     timeout = timeout * 1000 // for milliseconds for timeout
-    
     if (value && value.length > 0) {
       return Promise.resolve([key, ...value])
     }
 
-    const commandTimeout = setTimeout(() => {
-      Promise.resolve([key])
-    }, timeout)
-
     return new Promise<string[]>(resolve => {
+      const commandTimeout = setTimeout(() => {
+        return resolve([key])
+      }, timeout)
+
       const value = this.lpop(key)
       if (!value || value.length === 0) return false
 
