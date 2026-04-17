@@ -3,7 +3,7 @@ import {EventEmitter} from 'node:events'
 export default class Cache extends EventEmitter{
 
   private cache: Map<string, any> = new Map();
-  private requestQueue : Map<string, Array<() => void>> = new Map()
+  private requestQueue : Map<string, Array<() => boolean>> = new Map()
 
   private ITEM_ADDED = 'item added'
 
@@ -19,7 +19,6 @@ export default class Cache extends EventEmitter{
       this.handleSetCacheOptions(key, options);
     }
 
-    // this.emitItemAdded(key)
   }
 
   rpush(key: string, values: any[]): number {
@@ -32,12 +31,12 @@ export default class Cache extends EventEmitter{
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.push(...vals);
-      // this.emitItemAdded(key)
+      this.emitItemsAdded(key, vals.length)
       return existingValue.length
     } 
     
     this.cache.set(key, vals);
-    // this.emitItemAdded(key)
+    this.emitItemsAdded(key, vals.length)
  
     return vals.length;
   }
@@ -52,12 +51,12 @@ export default class Cache extends EventEmitter{
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.unshift(...vals)
-      // this.emitItemAdded(key)
+      this.emitItemsAdded(key, vals.length)
       return existingValue.length
     }
 
     this.cache.set(key, vals)
-    // this.emitItemAdded(key)
+    this.emitItemsAdded(key, vals.length)
 
     return vals.length
   }
@@ -103,30 +102,25 @@ export default class Cache extends EventEmitter{
     return result
   }
 
-  async blpop(key: string, timeout: number) : Promise<any[]> {
-    //create a new promise
-    while(!this.cache.has(key)) {
-      await new Promise(resolve => setTimeout(resolve, 0))
+  blpop(key: string, timeout: number) : Promise<string[]> {
+    const value = this.lpop(key)
+    if (value && value.length > 0) {
+      return Promise.resolve([key, ...value])
     }
 
-    return [key, ...this.lpop(key) as []]
-  //  if (!this.cache.has(key)) {
-  //   return new Promise<any[]>((resolve, reject) => {
-  //     const command = () => {
-  //         this.blpop(key, timeout).then(resolve, reject)
-  //     }
+    return new Promise<string[]>(resolve => {
+      const command = () => {
+        const value = this.lpop(key)
+        if (!value || value.length === 0) return false
 
-  //     this.requestQueue.has(key) ? 
-  //       this.requestQueue.get(key)?.push(command) : 
-  //       this.requestQueue.set(key, [command])
-  //   }) 
-  //  }
+        resolve([key, ...value])
+        return true
+      }
 
-  //  return new Promise((resolve, reject) => {
-  //     const data = this.lpop(key) as []
-  //     return resolve([key, ...data])
-  //  })
-
+      const commands = this.requestQueue.get(key) ?? []
+      commands.push(command)
+      this.requestQueue.set(key, commands)
+    })
   }
 
   llen(key: string) : number {
@@ -138,19 +132,32 @@ export default class Cache extends EventEmitter{
   }
 
   private handleDataAddedEvent() {
-    this.on(this.ITEM_ADDED, async itemKey => {
-      if (this.requestQueue.has(itemKey)) {
-        const commands = this.requestQueue.get(itemKey)!
-        for await (const command of commands) {
-          command()
-        } 
-      } 
+    this.on(this.ITEM_ADDED, (itemKey, itemCount = 1) => {
+      const commands = this.requestQueue.get(itemKey)
+      if (!commands) return
+
+      let resolvedCount = 0
+      while (resolvedCount < itemCount && commands.length > 0) {
+        const command = commands.shift()!
+        if (!command()) {
+          commands.unshift(command)
+          break
+        }
+
+        resolvedCount += 1
+      }
+
+      if (commands.length === 0) {
+        this.requestQueue.delete(itemKey)
+      }
     })
   }
 
-  private emitItemAdded(key: string) {
+  private emitItemsAdded(key: string, itemCount: number) {
+    if (itemCount === 0) return
+
     setImmediate(() => {
-      this.emit(this.ITEM_ADDED, key)
+      this.emit(this.ITEM_ADDED, key, itemCount)
     })
   }
 
