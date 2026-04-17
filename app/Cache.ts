@@ -19,7 +19,7 @@ export default class Cache extends EventEmitter{
       this.handleSetCacheOptions(key, options);
     }
 
-    this.emitItemAdded(key)
+    // this.emitItemAdded(key)
   }
 
   rpush(key: string, values: any[]): number {
@@ -109,7 +109,7 @@ export default class Cache extends EventEmitter{
       await new Promise(resolve => setTimeout(resolve, 0))
     }
 
-    return [key, ...this.lpop(key) as []]
+    return [key, ...this.cache.get(key) as []]
   //  if (!this.cache.has(key)) {
   //   return new Promise<any[]>((resolve, reject) => {
   //     const command = () => {
