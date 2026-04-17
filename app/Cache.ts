@@ -103,6 +103,7 @@ export default class Cache extends EventEmitter{
   }
 
   blpop(key: string, timeout: number) : Promise<string[]> {
+    console.log("TIMEOUT", timeout)
     const value = this.lpop(key)
     timeout = timeout * 1000 // for milliseconds for timeout
     if (value && value.length > 0) {

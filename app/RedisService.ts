@@ -70,7 +70,7 @@ export default class RedisService {
   async blpop(args: string[]): Promise<string> {
     try {
       const [key, timeout] = args;
-      const result = await this.cache.blpop(key, parseFloat(timeout));
+      const result = await this.cache.blpop(key, parseFloat(timeout) * 1.0);
       return this.writeArrayString(result);
     } catch {
       return "*-1\r\n";
@@ -102,3 +102,12 @@ export default class RedisService {
 // console.log("running blpop with args: ", args)
 // const result = await redisService.blpop(args)
 // console.log(result)
+
+const redisService = new RedisService();
+const [, ...args] = redisService.parse("*3\r\n$5\r\nBLPOP\r\n$8\r\npineapple\r\n$3\r\n5\r\n");
+console.log("running blpop with non-zero timeout args: ", args)
+const blpop = async () => await redisService.blpop(args)
+blpop()
+const [, ...newargs] = redisService.parse("*3\r\n$5\r\nRPUSH\r\n$9\r\npineapple\r\n$4\r\npear\r\n")
+let result = redisService.lpush(newargs)
+console.log(result) // "*-1\r\n" when no element is pushed before timeout
