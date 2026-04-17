@@ -112,7 +112,11 @@ export default class Cache extends EventEmitter{
 
     return new Promise<string[]>((resolve, reject) => {
       const commandTimeout = setTimeout(() => {
-        return reject([key])
+        if (timeout === 0.0) {
+          setTimeout(() => {})
+        } else {
+          return reject([key])
+        }
       }, timeout)
 
       const command = () => {
