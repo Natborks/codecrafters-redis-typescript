@@ -118,7 +118,7 @@ export default class Cache extends EventEmitter{
    }
 
    return new Promise((resolve, reject) => {
-      const data = this.lpop(key) as []
+      const data = this.get(key) as []
       return resolve([key, ...data])
    })
 
