@@ -103,7 +103,7 @@ export default class Cache extends EventEmitter{
     return result
   }
 
-  async blpop(key: string, timeout: number) : Promise<string[]>{
+  async blpop(key: string, timeout: number){
     //create a new promise
     while (!this.cache.has(key)) {
       await new Promise(resolve => setTimeout(resolve, 0))
