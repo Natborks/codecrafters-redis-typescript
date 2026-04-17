@@ -10,7 +10,7 @@ export default class RedisService {
   }
 
   ping(): string {
-    return "+PONG\r\n";
+    return this.writeSimpleString("PONG");
   }
 
   echo(args: string[]): string {
@@ -20,7 +20,7 @@ export default class RedisService {
   set(args: string[]): string {
     const [key, val, ...options] = args;
     this.cache.set(key, val, options);
-    return "+OK\r\n";
+    return this.writeSimpleString("OK");
   }
 
   rpush(args: string[]): string {
@@ -77,8 +77,21 @@ export default class RedisService {
     }
   }
 
+  async getType(args: string[]) {
+    const [key] = args
+    const result = this.cache.get(key)
+    if (!result) return this.writeSimpleString("none")
+    
+    return this.writeSimpleString("string")
+    
+  }
+
   unknownCommand(command: string): string {
     return `-ERR unknown command '${command}'\r\n`;
+  }
+
+  private writeSimpleString(value: string): string {
+    return `+${value}\r\n`;
   }
 
   private writeBulkString(args: string[]): string {

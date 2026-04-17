@@ -40,6 +40,9 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "BLPOP":
         connection.write(await redisService.blpop(args))
         break
+      case "TYPE":
+        connection.write(await redisService.getType(args))
+        break
     }
   })
 });
