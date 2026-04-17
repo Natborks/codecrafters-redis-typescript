@@ -132,24 +132,15 @@ export default class Cache extends EventEmitter{
   }
 
   private handleDataAddedEvent() {
-    this.on(this.ITEM_ADDED, (itemKey, itemCount = 1) => {
-      const commands = this.requestQueue.get(itemKey)
-      if (!commands) return
-
-      let resolvedCount = 0
-      while (resolvedCount < itemCount && commands.length > 0) {
-        const command = commands.shift()!
-        if (!command()) {
-          commands.unshift(command)
-          break
-        }
-
-        resolvedCount += 1
-      }
-
-      if (commands.length === 0) {
-        this.requestQueue.delete(itemKey)
-      }
+    this.on(this.ITEM_ADDED, itemKey => {
+      if (this.requestQueue.has(itemKey)) {
+        const commands = this.requestQueue.get(itemKey)!
+        const nextCommand = commands.shift()!
+        nextCommand()
+        // for (const command of commands) {
+        //   command()
+        // } 
+      } 
     })
   }
 
