@@ -4,68 +4,77 @@ import Parser from "./parser/Parser";
 export default class RedisService {
   private cache = new Cache();
 
-  async handle(data: Buffer): Promise<string> {
+  parse(data: Buffer): string[] {
     const parser = new Parser(data.toString());
-    const [command, ...args] = parser.getParsedString();
+    return parser.getParsedString();
+  }
 
-    if (!command) throw new Error("Command not found");
+  ping(): string {
+    return "+PONG\r\n";
+  }
 
-    switch (command.toUpperCase()) {
-      case "PING":
-        return "+PONG\r\n";
-      case "ECHO":
-        return this.writeBulkString(args);
-      case "SET": {
-        const [key, val, ...options] = args;
-        this.cache.set(key, val, options);
-        return "+OK\r\n";
-      }
-      case "RPUSH": {
-        const [key, ...values] = args;
-        const count = this.cache.rpush(key, values);
-        return `:${count}\r\n`;
-      }
-      case "LPUSH": {
-        const [key, ...values] = args;
-        const count = this.cache.lpush(key, values);
-        return `:${count}\r\n`;
-      }
-      case "GET": {
-        const [query] = args;
-        const result = this.cache.get(query);
-        return result ? this.writeBulkString([result]) : "$-1\r\n";
-      }
-      case "LRANGE": {
-        const [key, startIdx, endIdx] = args;
-        const values = this.cache.lrange(key, parseInt(startIdx), parseInt(endIdx));
-        return this.writeArrayString(values);
-      }
-      case "LLEN": {
-        const [key] = args;
-        const count = this.cache.llen(key);
-        return `:${count}\r\n`;
-      }
-      case "LPOP": {
-        const [key, numItems] = args;
-        const count = numItems === undefined ? undefined : parseInt(numItems);
-        const elems = this.cache.lpop(key, count);
+  echo(args: string[]): string {
+    return this.writeBulkString(args);
+  }
 
-        if (elems === null) {
-          return "$-1\r\n";
-        }
+  set(args: string[]): string {
+    const [key, val, ...options] = args;
+    this.cache.set(key, val, options);
+    return "+OK\r\n";
+  }
 
-        return elems.length === 1
-          ? this.writeBulkString(elems)
-          : this.writeArrayString(elems);
-      }
-      case "BLPOP": {
-        const [key, timeout] = args;
-        const result = await this.cache.blpop(key, parseInt(timeout));
-        return this.writeArrayString(result);
-      }
-      default:
-        return `-ERR unknown command '${command}'\r\n`;
+  rpush(args: string[]): string {
+    const [key, ...values] = args;
+    const count = this.cache.rpush(key, values);
+    return `:${count}\r\n`;
+  }
+
+  lpush(args: string[]): string {
+    const [key, ...values] = args;
+    const count = this.cache.lpush(key, values);
+    return `:${count}\r\n`;
+  }
+
+  get(args: string[]): string {
+    const [query] = args;
+    const result = this.cache.get(query);
+    return result ? this.writeBulkString([result]) : "$-1\r\n";
+  }
+
+  lrange(args: string[]): string {
+    const [key, startIdx, endIdx] = args;
+    const values = this.cache.lrange(key, parseInt(startIdx), parseInt(endIdx));
+    return this.writeArrayString(values);
+  }
+
+  llen(args: string[]): string {
+    const [key] = args;
+    const count = this.cache.llen(key);
+    return `:${count}\r\n`;
+  }
+
+  lpop(args: string[]): string {
+    const [key, numItems] = args;
+    const count = numItems === undefined ? undefined : parseInt(numItems);
+    const elems = this.cache.lpop(key, count);
+
+    if (elems === null) {
+      return "$-1\r\n";
     }
+
+    return elems.length === 1
+      ? this.writeBulkString(elems)
+      : this.writeArrayString(elems);
+  }
+
+  async blpop(args: string[]): Promise<string> {
+    const [key, timeout] = args;
+    const result = await this.cache.blpop(key, parseInt(timeout));
+    return this.writeArrayString(result);
+  }
+
+  unknownCommand(command: string): string {
+    return `-ERR unknown command '${command}'\r\n`;
   }
 
   private writeBulkString(args: string[]): string {
