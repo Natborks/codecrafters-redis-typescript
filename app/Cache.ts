@@ -37,7 +37,7 @@ export default class Cache extends EventEmitter{
     } 
     
     this.cache.set(key, vals);
-    this.emitItemAdded(key)
+    // this.emitItemAdded(key)
  
     return vals.length;
   }
