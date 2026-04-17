@@ -104,10 +104,11 @@ export default class RedisService {
 // console.log(result)
 
 const redisService = new RedisService();
-const [, ...args] = redisService.parse("*3\r\n$5\r\nBLPOP\r\n$8\r\npineapple\r\n$3\r\n5\r\n");
+const [, ...args] = redisService.parse("*3\r\n$5\r\nBLPOP\r\n$8\r\npineapple\r\n$3\r\n3\r\n");
 console.log("running blpop with non-zero timeout args: ", args)
 const blpop = async () => await redisService.blpop(args)
-blpop()
+const response = blpop()
 const [, ...newargs] = redisService.parse("*3\r\n$5\r\nRPUSH\r\n$9\r\npineapple\r\n$4\r\npear\r\n")
 let result = redisService.lpush(newargs)
-console.log(result) // "*-1\r\n" when no element is pushed before timeout
+console.log(result)
+console.log(response) // "*-1\r\n" when no element is pushed before timeout
