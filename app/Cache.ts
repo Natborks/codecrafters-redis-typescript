@@ -117,6 +117,7 @@ export default class Cache extends EventEmitter{
 
       const command = () => {
         const value = this.lpop(key) as []
+        console.log('getting value...', ...value)
         clearTimeout(commandTimeout)
         resolve([key, ...value])
         return 
