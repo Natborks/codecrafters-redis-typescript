@@ -115,10 +115,8 @@ export default class Cache extends EventEmitter{
         return reject([key])
       }, timeout)
 
-      const value = this.lpop(key)
-      if (!value || value.length === 0) return false
-
       const command = () => {
+        const value = this.lpop(key) as []
         clearTimeout(commandTimeout)
         resolve([key, ...value])
         return 
