@@ -52,12 +52,12 @@ export default class Cache extends EventEmitter{
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.unshift(...vals)
-      this.emitItemAdded(key)
+      // this.emitItemAdded(key)
       return existingValue.length
     }
 
     this.cache.set(key, vals)
-    this.emitItemAdded(key)
+    // this.emitItemAdded(key)
 
     return vals.length
   }
