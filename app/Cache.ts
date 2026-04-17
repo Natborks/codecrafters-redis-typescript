@@ -103,29 +103,24 @@ export default class Cache extends EventEmitter{
     return result
   }
 
-  async blpop(key: string, timeout: number){
+  blpop(key: string, timeout: number) : Promise<any[]> {
     //create a new promise
-    while (!this.cache.has(key)) {
-      await new Promise(resolve => setTimeout(resolve, 0))
-    }
+   if (!this.cache.has(key)) {
+    return new Promise<any[]>((resolve, reject) => {
+      const command = () => {
+          this.blpop(key, timeout).then(resolve, reject)
+      }
 
-    return this.lpop(key)
-  //  if (!this.cache.has(key)) {
-  //   return new Promise<any[]>((resolve, reject) => {
-  //     const command = () => {
-  //         this.blpop(key, timeout).then(resolve, reject)
-  //     }
+      this.requestQueue.has(key) ? 
+        this.requestQueue.get(key)?.push(command) : 
+        this.requestQueue.set(key, [command])
+    }) 
+   }
 
-  //     this.requestQueue.has(key) ? 
-  //       this.requestQueue.get(key)?.push(command) : 
-  //       this.requestQueue.set(key, [command])
-  //   }) 
-  //  }
-
-  //  return new Promise((resolve, reject) => {
-  //     const data = this.lpop(key) as []
-  //     return resolve([key, ...data])
-  //  })
+   return new Promise((resolve, reject) => {
+      const data = this.lpop(key) as []
+      return resolve([key, ...data])
+   })
 
   }
 

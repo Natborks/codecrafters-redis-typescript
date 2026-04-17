@@ -83,8 +83,9 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const func = async () => {
           let [key, timeout] = args
           const result = await cache.blpop(key, parseInt(timeout))
-          const response = writeArrayString(result as string[])
-          console.log("BLPOP: ", response)
+          console.log("BLPOP: ", result)
+          const response = writeArrayString(result)
+          
           connection.write(response)
         }
 
@@ -105,6 +106,7 @@ function writeBulkString(args: string[]) : string {
 }
 
 function writeArrayString(args: string[]) : string {
+
   const response = writeBulkString(args)
   console.log("RESPONSE: ",response)
   return `*${args.length}\r\n${response}`
