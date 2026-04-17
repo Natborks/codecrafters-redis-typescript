@@ -109,7 +109,7 @@ export default class Cache extends EventEmitter{
       await new Promise(resolve => setTimeout(resolve, 0))
     }
 
-    return [key, this.cache.get(key)]
+    return [key, ...this.lpop(key) as []]
   //  if (!this.cache.has(key)) {
   //   return new Promise<any[]>((resolve, reject) => {
   //     const command = () => {
