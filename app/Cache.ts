@@ -110,19 +110,19 @@ export default class Cache extends EventEmitter{
       return Promise.resolve([key, ...value])
     }
 
+    const commandTimeout = setTimeout(() => {
+      Promise.resolve([key])
+    }, timeout)
+
     return new Promise<string[]>(resolve => {
       const value = this.lpop(key)
       if (!value || value.length === 0) return false
 
       const command = () => {
-
+        clearTimeout(commandTimeout)
         resolve([key, ...value])
         return 
       }
-
-      setTimeout(() => {
-        resolve([key, ...value])
-      }, timeout)
 
       const commands = this.requestQueue.get(key) ?? []
       commands.push(command)
