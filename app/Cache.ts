@@ -1,5 +1,3 @@
-import { rejects } from 'node:assert';
-import { resolve } from 'node:dns';
 import {EventEmitter} from 'node:events'
 
 export default class Cache extends EventEmitter{
@@ -21,9 +19,7 @@ export default class Cache extends EventEmitter{
       this.handleSetCacheOptions(key, options);
     }
 
-    process.nextTick(() => {
-      this.emit(this.ITEM_ADDED, key)
-    })
+    this.emitItemAdded(key)
   }
 
   rpush(key: string, values: any[]): number {
@@ -36,16 +32,12 @@ export default class Cache extends EventEmitter{
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.push(...vals);
-      process.nextTick(() => {
-        this.emit(this.ITEM_ADDED, key)
-      })
+      this.emitItemAdded(key)
       return existingValue.length
     } 
     
     this.cache.set(key, vals);
-    process.nextTick(() => {
-      this.emit(this.ITEM_ADDED, key)
-    })
+    this.emitItemAdded(key)
  
     return vals.length;
   }
@@ -60,16 +52,12 @@ export default class Cache extends EventEmitter{
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.unshift(...vals)
-      process.nextTick(() => {
-        this.emit(this.ITEM_ADDED, key)
-      })
+      this.emitItemAdded(key)
       return existingValue.length
     }
 
     this.cache.set(key, vals)
-    process.nextTick(() => {
-      this.emit(this.ITEM_ADDED, key)
-    })
+    this.emitItemAdded(key)
 
     return vals.length
   }
@@ -145,13 +133,19 @@ export default class Cache extends EventEmitter{
   }
 
   private handleDataAddedEvent() {
-    this.on(this.ITEM_ADDED, itemKey => {
+    this.on(this.ITEM_ADDED, async itemKey => {
       if (this.requestQueue.has(itemKey)) {
         const commands = this.requestQueue.get(itemKey)!
         for (const command of commands) {
-          command()
+          await command()
         } 
       } 
+    })
+  }
+
+  private emitItemAdded(key: string) {
+    setImmediate(() => {
+      this.emit(this.ITEM_ADDED, key)
     })
   }
 
