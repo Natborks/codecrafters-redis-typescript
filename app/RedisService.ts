@@ -68,9 +68,13 @@ export default class RedisService {
   }
 
   async blpop(args: string[]): Promise<string> {
-    const [key, timeout] = args;
-    const result = await this.cache.blpop(key, parseFloat(timeout));
-    return this.writeArrayString(result);
+    try {
+      const [key, timeout] = args;
+      const result = await this.cache.blpop(key, parseFloat(timeout));
+      return this.writeArrayString(result);
+    } catch {
+      return "*-1\r\n";
+    }
   }
 
   unknownCommand(command: string): string {
@@ -93,8 +97,8 @@ export default class RedisService {
   }
 }
 
-const redisService = new RedisService();
-const [command, ...args] = redisService.parse("*3\r\n$5\r\nBLPOP\r\n$9\r\nraspberry\r\n$3\r\n0.1\r\n");
-console.log("running blpop with args: ", args)
-const result = await redisService.blpop(args)
-console.log(result)
+// const redisService = new RedisService();
+// const [command, ...args] = redisService.parse("*3\r\n$5\r\nBLPOP\r\n$9\r\nraspberry\r\n$3\r\n0.1\r\n");
+// console.log("running blpop with args: ", args)
+// const result = await redisService.blpop(args)
+// console.log(result)

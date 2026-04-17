@@ -109,9 +109,9 @@ export default class Cache extends EventEmitter{
       return Promise.resolve([key, ...value])
     }
 
-    return new Promise<string[]>(resolve => {
+    return new Promise<string[]>((resolve, reject) => {
       const commandTimeout = setTimeout(() => {
-        return resolve([key])
+        return reject([key])
       }, timeout)
 
       const value = this.lpop(key)
