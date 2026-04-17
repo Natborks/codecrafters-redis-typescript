@@ -32,7 +32,7 @@ export default class Cache extends EventEmitter{
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.push(...vals);
-      this.emitItemAdded(key)
+      // this.emitItemAdded(key)
       return existingValue.length
     } 
     
