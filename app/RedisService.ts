@@ -88,10 +88,10 @@ export default class RedisService {
 
   xadd(args: string[]): string {
     const [key, entryId, ...entries] = args;
-    const topItem = this.cache.getTopItem(key)
+    const topItemId = this.cache.getTopItem(key)
 
-    if (topItem) {
-      const comp = IdUtils.validateId(topItem, entryId)
+    if (topItemId) {
+      const comp = IdUtils.validateId(topItemId, entryId)
 
       if (comp === 0) return this.writeSimpleError("ERR The ID specified in \
         XADD must be greater than 0-0")

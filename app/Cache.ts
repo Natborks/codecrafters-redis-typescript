@@ -158,9 +158,8 @@ export default class Cache extends EventEmitter{
   }
 
   xadd(key: string, entryId: string, entries: string[]): string {
-    console.log("ENTRIES: ", entries)
     const streamQueue = this.stream.get(key) ?? []
-    streamQueue.push(entryId, ...entries)
+    streamQueue.push({id: entryId, values: entries})
     this.stream.set(key, streamQueue)
     return entryId;
   }
