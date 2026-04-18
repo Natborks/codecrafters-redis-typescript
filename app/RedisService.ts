@@ -132,6 +132,7 @@ export default class RedisService {
   }
 }
 
+console.log(IdUtils.validateId('1-2', '1-2'))
 // const redisService = new RedisService();
 // const [command, ...args] = redisService.parse("*3\r\n$5\r\nBLPOP\r\n$9\r\nraspberry\r\n$3\r\n0.1\r\n");
 // const result = await redisService.blpop(args)

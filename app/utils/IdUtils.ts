@@ -1,5 +1,6 @@
 export default class IdUtils {
     static validateId(topId: string, newId: string) : number{
+        console.log(topId, newId)
         let [id, newIdSeq] = newId.split("-")
         let  [tId, topIdSeq] = topId.split("-")
 
