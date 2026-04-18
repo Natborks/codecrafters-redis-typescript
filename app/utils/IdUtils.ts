@@ -12,20 +12,20 @@ export default class IdUtils {
      */
     static validateId(topId: string, newId: string) : number{
         console.log(topId, newId)
-        let [newMillisecondsPart, newSequencePart] = newId.split("-")
-        let  [topMillisecondsPart, topSequencePart] = topId.split("-")
+        let [id, newIdSeq] = newId.split("-")
+        let  [tId, topIdSeq] = topId.split("-")
 
-        const newMilliseconds = parseInt(newMillisecondsPart)
-        const newSequence = parseInt(newSequencePart)
-        const topMilliseconds = parseInt(topMillisecondsPart)
-        const topSequence = parseInt(topSequencePart)
+        const idmill = parseInt(id)
+        const idSeq = parseInt(newIdSeq)
+        const tidMill = parseInt(tId)
+        const tidSeq = parseInt(topIdSeq)
 
-        if (newMilliseconds === 0 && newSequence === 0) return 0
+        if (idmill === 0 && idSeq === 0) return 0
 
-        if (newMilliseconds < topMilliseconds) return -1
+        if (idmill < tidMill) return -1
 
-        if (newMilliseconds === topMilliseconds) {
-            if (newSequence <= topSequence) {
+        if (idmill === tidMill) {
+            if (idSeq <= tidSeq) {
                 return -1
             }
         }
