@@ -9,6 +9,7 @@ export default class Scanner {
 
     constructor(source: string) {
         this.#source = source.split('\r\n')
+        console.log(this.#source)
         this.#tokens = []
     }
 
