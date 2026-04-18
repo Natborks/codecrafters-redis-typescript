@@ -94,7 +94,7 @@ export default class RedisService {
 
     if (sequence === "*") {
       entryId = IdUtils.generateSequence(topItemId, entryId)
-      console.log(entryId)
+      console.log("ENTRY-ID", entryId)
     }
 
     if (topItemId) {
