@@ -93,11 +93,9 @@ export default class RedisService {
     if (topItemId) {
       const comp = IdUtils.validateId(topItemId, entryId)
 
-      if (comp === 0) return this.writeSimpleError("ERR The ID specified in \
-        XADD must be greater than 0-0")
+      if (comp === 0) return this.writeSimpleError("ERR The ID specified in XADD must be greater than 0-0")
 
-      if (comp === -1) return this.writeSimpleError("ERR The ID specified in XADD is \
-        equal or smaller than the target stream top item")
+      if (comp === -1) return this.writeSimpleError("ERR The ID specified in XADD is equal or smaller than the target stream top item")
     }
 
     const result = this.cache.xadd(key, entryId, entries);
