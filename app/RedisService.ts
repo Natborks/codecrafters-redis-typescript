@@ -87,8 +87,14 @@ export default class RedisService {
   }
 
   xadd(args: string[]): string {
-    const [key, entryId, ...entries] = args;
+    const [key, rawEntryId, ...entries] = args;
+    let entryId = rawEntryId
+    const [, sequence] = entryId.split("-")
     const topItemId = this.cache.getTopItem(key)
+
+    if (sequence === "*") {
+      entryId = IdUtils.generateSequence(topItemId, entryId)
+    }
 
     if (topItemId) {
       const comp = IdUtils.validateId(topItemId, entryId)

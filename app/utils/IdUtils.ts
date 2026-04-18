@@ -32,4 +32,23 @@ export default class IdUtils {
         return 1
         
     }
+
+    static generateSequence(topId: string | null, newId: string): string {
+        const [newMillisecondsPart] = newId.split("-")
+        const newMilliseconds = parseInt(newMillisecondsPart)
+
+        let sequence = newMilliseconds === 0 ? 1 : 0
+
+        if (topId) {
+            const [topMillisecondsPart, topSequencePart] = topId.split("-")
+            const topMilliseconds = parseInt(topMillisecondsPart)
+            const topSequence = parseInt(topSequencePart)
+
+            if (newMilliseconds === topMilliseconds) {
+                sequence = topSequence + 1
+            }
+        }
+
+        return `${newMillisecondsPart}-${sequence}`
+    }
 }
