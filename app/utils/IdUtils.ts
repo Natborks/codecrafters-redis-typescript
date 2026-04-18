@@ -11,7 +11,6 @@ export default class IdUtils {
      * @returns 0 when newId is 0-0, -1 when newId is not greater than topId, otherwise 1.
      */
     static validateId(topId: string, newId: string) : number{
-        console.log(topId, newId)
         let [id, newIdSeq] = newId.split("-")
         let  [tId, topIdSeq] = topId.split("-")
 
