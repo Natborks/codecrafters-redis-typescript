@@ -78,7 +78,8 @@ export default class Cache extends EventEmitter{
   getTopItem(key: string): any {
     const topItemList = this.stream.get(key)
     if(!topItemList) return null
-    return topItemList[topItemList.length - 1]
+    const topItem = topItemList[topItemList - 1]
+    return topItem['id']
   }
 
   lrange(key: string, rawStartIdx: number, rawEndIdx: number) : string[]{
@@ -157,6 +158,7 @@ export default class Cache extends EventEmitter{
   }
 
   xadd(key: string, entryId: string, entries: string[]): string {
+    console.log("ENTRIES: ", entries)
     const streamQueue = this.stream.get(key) ?? []
     streamQueue.push(entryId, ...entries)
     this.stream.set(key, streamQueue)
