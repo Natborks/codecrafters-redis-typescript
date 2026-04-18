@@ -1,5 +1,6 @@
 import {EventEmitter} from 'node:events'
 
+//TODO: There's too much domain logic in this layer. Refactor into Service layer
 export default class Cache extends EventEmitter{
 
   private cache: Map<string, any> = new Map();
@@ -72,6 +73,11 @@ export default class Cache extends EventEmitter{
       this.stream.has(key) ? "stream" : "none"
 
     return response
+  }
+
+  getTopItem(key: string): any {
+    const topItemList = this.stream.get(key)
+    return topItemList[topItemList.length - 1]
   }
 
   lrange(key: string, rawStartIdx: number, rawEndIdx: number) : string[]{

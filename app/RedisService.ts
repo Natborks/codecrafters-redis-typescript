@@ -1,5 +1,6 @@
 import Cache from "./Cache";
 import Parser from "./parser/Parser";
+import IdUtils from "./utils/IdUtils";
 
 export default class RedisService {
   private cache = new Cache();
@@ -87,6 +88,16 @@ export default class RedisService {
 
   xadd(args: string[]): string {
     const [key, entryId, ...entries] = args;
+    const topItem = this.cache.getTopItem(key)
+
+    const comp = IdUtils.validateId(topItem, entryId)
+
+    if (comp === 0) return this.writeSimpleError("ERR The ID specified in \
+      XADD must be greater than 0-0")
+
+    if (comp === -1) return this.writeSimpleError("ERR The ID specified in XADD is \
+       equal or smaller than the target stream top item")
+
     const result = this.cache.xadd(key, entryId, entries);
     return this.writeBulkString([result]);
   }
@@ -112,6 +123,10 @@ export default class RedisService {
   private writeArrayString(args: string[]): string {
     const response = this.writeBulkString(args);
     return `*${args.length}\r\n${response}`;
+  }
+
+  private writeSimpleError(error: string): string {
+    return `-${error}\r\n`
   }
 }
 
