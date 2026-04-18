@@ -78,6 +78,7 @@ export default class Cache extends EventEmitter{
   getTopItem(key: string): any {
     const topItemList = this.stream.get(key)
     if(!topItemList) return null
+    console.log(topItemList)
     const topItem = topItemList[topItemList - 1]
     return topItem['id']
   }
