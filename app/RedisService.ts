@@ -92,6 +92,8 @@ export default class RedisService {
     const [, sequence] = entryId.split("-")
     const topItemId = this.cache.getTopItem(key)
 
+    console.log("SEQUENCE", sequence)
+
     if (sequence === "*") {
       entryId = IdUtils.generateSequence(topItemId, entryId)
       console.log("ENTRY-ID", entryId)
