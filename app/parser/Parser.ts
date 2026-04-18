@@ -18,47 +18,48 @@ export default class Parser {
         this.#source = source    
         const scanner = new Scanner(this.#source)
         const tokens = scanner.scanTokens()
-        const commandType = tokens.at(0)?.lexeme
+        // const commandType = tokens.at(0)?.lexeme
+        this.#parsedData = tokens
 
-        if (commandType === undefined) {
-            throw new Error("No command type found")
-        }
+        // if (commandType === undefined) {
+        //     throw new Error("No command type found")
+        // }
     
-        this.#parsedData = this.parseCommand(commandType, tokens, [])
+        // this.#parsedData = this.parseCommand(commandType, tokens, [])
     }
 
-    private parseCommand(commandType: string, tokens: Token[], acc: string[]) : string[] {
+    // private parseCommand(commandType: string, tokens: Token[], acc: string[]) : string[] {
 
-        if (commandType === SIMPLE_STRING) {
-            const command = tokens.at(1)?.lexeme
-            if (command === undefined) {
-                throw new Error("Missing command token")
-            }
+    //     if (commandType === SIMPLE_STRING) {
+    //         const command = tokens.at(1)?.lexeme
+    //         if (command === undefined) {
+    //             throw new Error("Missing command token")
+    //         }
 
-            const args = this.parseSimpleString(tokens.slice(SIMPLE_STRING_OFFSET))
-            return [command, args]
-        }
+    //         const args = this.parseSimpleString(tokens.slice(SIMPLE_STRING_OFFSET))
+    //         return [command, args]
+    //     }
 
-        if (commandType === ARRAY) {
-            const commandType = tokens.at(4)?.lexeme
+    //     if (commandType === ARRAY) {
+    //         const commandType = tokens.at(4)?.lexeme
             
-            if(!commandType) throw new Error("Missing command token")
+    //         if(!commandType) throw new Error("Missing command token")
 
-            return this.parseCommand(commandType, tokens.slice(ARRAY_OFFSET), acc)
-        }
+    //         return this.parseCommand(commandType, tokens.slice(ARRAY_OFFSET), acc)
+    //     }
 
-        if (commandType === BULK_STRING) {
+    //     if (commandType === BULK_STRING) {
 
-            const result = this.parseBulkString(tokens.slice(BULK_STRING_OFFSET))
+    //         const result = this.parseBulkString(tokens.slice(BULK_STRING_OFFSET))
             
-            return [...acc, ...result]
-        }
+    //         return [...acc, ...result]
+    //     }
 
-        throw new Error("Unsupported command type")
-    }
+    //     throw new Error("Unsupported command type")
+    // }
 
     getParsedString() {
-        console.log("PARSED: ", this.#parsedData)
+        console.log(this.#parsedData)
         return this.#parsedData
     }
 

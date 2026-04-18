@@ -9,115 +9,104 @@ export default class Scanner {
 
     constructor(source: string) {
         this.#source = source.split('\r\n')
-        console.log(this.#source)
         this.#tokens = []
     }
 
-    scanTokens(): Token[] {
-
-        while (!this.isAtEnd()) {
-            this.#start = this.#current
-            this.scanToken()
+    scanTokens(): string[] {
+        const tokens = []
+        for (const token of this.#source) {
+            const firstChar = token[0]
+            if (firstChar === "*" || firstChar === "$")
+                continue
+            tokens.push(token)
         }
-        return this.#tokens
+
+        return tokens
     } 
 
-    private isAtEnd() : boolean {
-        return this.#current >= this.#source.length
-    }
+    // private isAtEnd() : boolean {
+    //     return this.#current >= this.#source.length
+    // }
 
+    // private scanToken(token: string) : void  {
+    //     const c = this.advance()
 
-    private scanToken() : void  {
-        const c = this.advance()
+    //     if (this.isAlpha(c)) {
+    //         this.extractString()
+    //         return
+    //     }
 
-        if (this.isAlpha(c)) {
-            this.extractString()
-            return
-        }
+    //     if (this.isNum(c)) {
+    //         this.extractNum()
+    //         return
+    //     }
 
-        if (this.isNum(c)) {
-            this.extractNum()
-            return
-        }
+    //     switch (c.charAt(0)) {
+    //         case '*':
+    //         case '$':
 
-        switch (c) {
-            case '*':
-                this.addToken(TokenType.STAR, null)
-                break
-            case '$':
-                this.addToken(TokenType.DOLLAR, null)
-                break
-            case '\r':
-                this.addToken(TokenType.CR, null)
-                break
-            case '\n':
-                this.addToken(TokenType.LF, null)
-                break
-            case '-':
-                this.extractNum()
-                break
-            default:
-                throw new Error("Unexpected Character")
-        }
-    }
+    //         default:
+    //             throw new Error("Unexpected Character")
+    //     }
+    // }
 
-    private extractString() {
-        while (!this.isAtEnd()) {
-           const currentChar = this.#source[this.#current] 
-           if (!this.isAlpha(currentChar)) {
-                const literal = this.extractLiteral()
-                this.addToken(TokenType.STRING, literal)
-                return 
-           }
+    // private extractString() {
+    //     while (!this.isAtEnd()) {
+    //        const currentChar = this.#source[this.#current] 
+    //        if (!this.isAlpha(currentChar)) {
+    //             const literal = this.extractLiteral()
+    //             this.addToken(TokenType.STRING, literal)
+    //             return 
+    //        }
 
-           this.advance()
-        }
-        const literal = this.extractLiteral()
-        this.addToken(TokenType.STRING, literal)
-    }
+    //        this.advance()
+    //     }
+    //     const literal = this.extractLiteral()
+    //     this.addToken(TokenType.STRING, literal)
+    // }
 
-    private advance() : string {
-       return this.#source[this.#current++] 
-    }
+    // private advance() : string {
+    //    return this.#source[this.#current++] 
+    // }
 
-    private extractNum() {
-        while (!this.isAtEnd()) {
-            const char = this.#source[this.#current]
-            //handle cases where token is decimal point. Advance twice
-            if (char === '.' || char === '-' && this.isNum(this.#source[this.#current+1])) {
-                this.advance()
-                this.advance()
-            }
+    // private extractNum() {
+    //     while (!this.isAtEnd()) {
+    //         const char = this.#source[this.#current]
+    //         //handle cases where token is decimal point. Advance twice
+    //         if (char === '.' || char === '-' && this.isNum(this.#source[this.#current+1])) {
+    //             this.advance()
+    //             this.advance()
+    //         }
 
-            if (!this.isNum(char)) {
-                const literal = this.extractLiteral()
-                this.addToken(TokenType.NUMBER, literal)
-                return
-            } 
+    //         if (!this.isNum(char)) {
+    //             const literal = this.extractLiteral()
+    //             this.addToken(TokenType.NUMBER, literal)
+    //             return
+    //         } 
 
-            this.advance()
-        }
+    //         this.advance()
+    //     }
 
-        const literal = this.extractLiteral()
-        this.addToken(TokenType.NUMBER, literal)
+    //     const literal = this.extractLiteral()
+    //     this.addToken(TokenType.NUMBER, literal)
 
-    }
+    // }
 
-    private addToken(type: TokenType, literal: any) : void {
-        const lexeme = this.extractLiteral()
-        this.#tokens.push(new Token(type, lexeme, literal))
-    }
+    // private addToken(type: TokenType, literal: any) : void {
+    //     const lexeme = this.extractLiteral()
+    //     this.#tokens.push(new Token(type, lexeme, literal))
+    // }
 
-    private isAlpha(c: string) : boolean {
-       return /[A-Za-z_]/.test(c) 
-    }
+    // private isAlpha(c: string) : boolean {
+    //    return /[A-Za-z_]/.test(c) 
+    // }
      
-    private isNum(c: string): boolean {
-        return /\d/.test(c)
-    }
+    // private isNum(c: string): boolean {
+    //     return /\d/.test(c)
+    // }
 
-    private extractLiteral(): string {
-        return this.#source.substring(this.#start, this.#current)
-    }
+    // private extractLiteral(): string {
+    //     return this.#source.substring(this.#start, this.#current)
+    // }
 
 }
