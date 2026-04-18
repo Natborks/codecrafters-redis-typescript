@@ -90,13 +90,15 @@ export default class RedisService {
     const [key, entryId, ...entries] = args;
     const topItem = this.cache.getTopItem(key)
 
-    const comp = IdUtils.validateId(topItem, entryId)
+    if (topItem) {
+      const comp = IdUtils.validateId(topItem, entryId)
 
-    if (comp === 0) return this.writeSimpleError("ERR The ID specified in \
-      XADD must be greater than 0-0")
+      if (comp === 0) return this.writeSimpleError("ERR The ID specified in \
+        XADD must be greater than 0-0")
 
-    if (comp === -1) return this.writeSimpleError("ERR The ID specified in XADD is \
-       equal or smaller than the target stream top item")
+      if (comp === -1) return this.writeSimpleError("ERR The ID specified in XADD is \
+        equal or smaller than the target stream top item")
+    }
 
     const result = this.cache.xadd(key, entryId, entries);
     return this.writeBulkString([result]);
