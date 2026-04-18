@@ -21,7 +21,7 @@ export default class Scanner {
             tokens.push(token)
         }
 
-        return tokens
+        return tokens.slice(0, tokens.length - 1)
     } 
 
     // private isAtEnd() : boolean {

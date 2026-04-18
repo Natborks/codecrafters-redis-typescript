@@ -59,7 +59,7 @@ export default class Parser {
     // }
 
     getParsedString() {
-        console.log(this.#parsedData)
+        console.log("Parsed: ",this.#parsedData)
         return this.#parsedData
     }
 
