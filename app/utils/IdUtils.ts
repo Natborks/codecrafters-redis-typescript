@@ -1,20 +1,31 @@
 export default class IdUtils {
+    /**
+     * Compare topId to newId. Each string consists of a two-part
+     * idInMilliseconds-sequence number.
+     *
+     * A return value of 0 means both idMilliseconds and sequence number are 0.
+     * -1 means the latestId (topId) in the stream is greater than the new record.
+     *
+     * @param topId The latest ID already in the stream.
+     * @param newId The ID being validated for the new record.
+     * @returns 0 when newId is 0-0, -1 when newId is not greater than topId, otherwise 1.
+     */
     static validateId(topId: string, newId: string) : number{
         console.log(topId, newId)
-        let [id, newIdSeq] = newId.split("-")
-        let  [tId, topIdSeq] = topId.split("-")
+        let [newMillisecondsPart, newSequencePart] = newId.split("-")
+        let  [topMillisecondsPart, topSequencePart] = topId.split("-")
 
-        const idmill = parseInt(id)
-        const idSeq = parseInt(newIdSeq)
-        const tidMill = parseInt(tId)
-        const tidSeq = parseInt(topIdSeq)
+        const newMilliseconds = parseInt(newMillisecondsPart)
+        const newSequence = parseInt(newSequencePart)
+        const topMilliseconds = parseInt(topMillisecondsPart)
+        const topSequence = parseInt(topSequencePart)
 
-        if (idmill === 0 && idSeq === 0) return 0
+        if (newMilliseconds === 0 && newSequence === 0) return 0
 
-        if (idmill < tidMill) return -1
+        if (newMilliseconds < topMilliseconds) return -1
 
-        if (idmill === tidMill) {
-            if (idSeq <= tidSeq) {
+        if (newMilliseconds === topMilliseconds) {
+            if (newSequence <= topSequence) {
                 return -1
             }
         }
