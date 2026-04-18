@@ -79,11 +79,16 @@ export default class RedisService {
 
   async getType(args: string[]) {
     const [key] = args
-    const result = this.cache.get(key)
-    if (!result) return this.writeSimpleString("none")
+    const type = this.cache.getType(key)
+
+    return this.writeSimpleString(type)
     
-    return this.writeSimpleString("string")
-    
+  }
+
+  xadd(args: string[]): string {
+    const [key, entryId, ...entries] = args;
+    const result = this.cache.xadd(key, entryId, entries);
+    return this.writeBulkString([result]);
   }
 
   unknownCommand(command: string): string {

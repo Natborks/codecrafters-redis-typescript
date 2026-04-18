@@ -3,6 +3,7 @@ import {EventEmitter} from 'node:events'
 export default class Cache extends EventEmitter{
 
   private cache: Map<string, any> = new Map();
+  private stream: Map<string, any> = new Map();
   private requestQueue : Map<string, Array<() => void>> = new Map()
 
   private ITEM_ADDED = 'item added'
@@ -63,6 +64,14 @@ export default class Cache extends EventEmitter{
 
   get(key: string): any {
     return this.cache.get(key);
+  }
+
+  getType(key: string): string {
+    const response = this.cache.has(key) ?
+      "string" :
+      this.stream.has(key) ? "stream" : "none"
+
+    return response
   }
 
   lrange(key: string, rawStartIdx: number, rawEndIdx: number) : string[]{
@@ -138,6 +147,13 @@ export default class Cache extends EventEmitter{
     if (!values) return 0
 
     return values.length
+  }
+
+  xadd(key: string, entryId: string, entries: string[]): string {
+    const streamQueue = this.stream.get(key) ?? []
+    streamQueue.push(entryId, ...entries)
+    this.stream.set(key, streamQueue)
+    return entryId;
   }
 
   private handleDataAddedEvent() {

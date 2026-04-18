@@ -43,6 +43,9 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "TYPE":
         connection.write(await redisService.getType(args))
         break
+      case "XADD":
+        connection.write(redisService.xadd(args))
+        break
     }
   })
 });
