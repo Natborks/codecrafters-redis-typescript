@@ -58,6 +58,7 @@ export default class Parser {
     }
 
     getParsedString() {
+        console.log("PARSED: ", this.#parsedData)
         return this.#parsedData
     }
 
