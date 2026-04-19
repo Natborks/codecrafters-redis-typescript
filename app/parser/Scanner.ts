@@ -16,8 +16,10 @@ export default class Scanner {
         const tokens = []
         for (const token of this.#source) {
             const firstChar = token[0]
-            if (firstChar === "*" || firstChar === "$")
-                continue
+            if (token.length > 1) {
+                if (firstChar === "*" && token.length > 1|| firstChar === "$")
+                    continue
+            }
             tokens.push(token)
         }
 
