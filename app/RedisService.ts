@@ -89,14 +89,17 @@ export default class RedisService {
   xadd(args: string[]): string {
     const [key, rawEntryId, ...entries] = args;
     let entryId = rawEntryId
-    const [, sequence] = entryId.split("-")
+    
     const topItemId = this.cache.getTopItem(key)
+    
 
-    console.log("SEQUENCE", rawEntryId)
-
-    if (sequence === "*") {
-      entryId = IdUtils.generateSequence(topItemId, entryId)
-      console.log("ENTRY-ID", entryId)
+    if (entryId === "*") {
+      const millisecondsPart = Date.now().toString()
+      const streamObj = this.cache.hasStreamObj(key, millisecondsPart)
+      entryId = IdUtils.autogenerateId(streamObj, millisecondsPart)
+    } else {
+      const [, sequence] = entryId.split("-")
+      if (sequence === "*") entryId = IdUtils.generateSequence(topItemId, entryId)
     }
 
     if (topItemId) {

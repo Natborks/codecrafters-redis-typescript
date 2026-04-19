@@ -83,6 +83,22 @@ export default class Cache extends EventEmitter{
     return topItem['id']
   }
 
+  hasStreamObj(key: string, millisecondsPart: string): string | null {
+    const streamQueue = this.stream.get(key)
+    if (!streamQueue) return null
+
+    for (let i = streamQueue.length - 1; i >= 0; i -= 1) {
+      const {id} = streamQueue[i]
+      const [streamMillisecondsPart] = id.split("-")
+
+      if (streamMillisecondsPart === millisecondsPart) {
+        return id
+      }
+    }
+
+    return null
+  }
+
   lrange(key: string, rawStartIdx: number, rawEndIdx: number) : string[]{
     
     if (!this.cache.has(key)) return []

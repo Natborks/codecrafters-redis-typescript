@@ -51,4 +51,18 @@ export default class IdUtils {
 
         return `${newMillisecondsPart}-${sequence}`
     }
+
+    static autogenerateId(existingId: string | null, millisecondsPart: string): string {
+        let sequence = 0
+
+        if (existingId) {
+            const [existingMillisecondsPart, sequencePart] = existingId.split("-")
+
+            if (existingMillisecondsPart === millisecondsPart) {
+                sequence = parseInt(sequencePart) + 1
+            }
+        }
+
+        return `${millisecondsPart}-${sequence}`
+    }
 }
