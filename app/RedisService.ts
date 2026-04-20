@@ -86,9 +86,8 @@ export default class RedisService {
 
   async getType(args: string[]) {
     const [key] = args
-    const type = this.cache.getType(key)
 
-    return ResponseUtils.writeSimpleString(type)
+    return ResponseUtils.writeSimpleString(this.cache.getType(key))
     
   }
 

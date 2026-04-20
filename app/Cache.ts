@@ -193,11 +193,31 @@ export default class Cache extends EventEmitter{
     //get array for key
     //get index of first item. get index of second item. 
       const streamValues = this.stream.get(key)
+      if (!streamValues) return 
+
       for (let i = 0; i < streamValues?.length; i++) {
-        console.log("STREAM VALUE", streamValues[i])
+        const [id] = streamValues[i]
+        if (id === startId) {
+          return this.extractValues(streamValues.slice(i), endId)
+        }
       }
+
+      
       // for {key, value} in array
         //if 
+  }
+
+  private extractValues (stream: {id: string, values: any[]}, endId: string) {
+    const result = []
+    let idx = 0
+
+    do {
+      const currId = stream[idx++]
+      const [id, values] = stream
+      result.push([id, values])
+    } while (currId != endId)
+
+    return result
   }
 
   // private handleSetCacheOptions(key: string, options: string[]) {
