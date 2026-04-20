@@ -132,7 +132,7 @@ export default class RedisService {
 
     const result = this.cache.xrange(key, startId, endId)
 
-    console.log(result)
+    console.log("RESPONSE: ", result)
 
     return "string"
   }
