@@ -192,19 +192,20 @@ export default class Cache extends EventEmitter{
   xrange(key: string, startId: string, endId: string) {
     //get array for key
     //get index of first item. get index of second item. 
-      const streamValues = this.stream.get(key)
-      if (!streamValues) return 
+      const streamArray = this.stream.get(key)
+      if (!streamArray) return 
 
-      for (let i = 0; i < streamValues?.length; i++) {
-        const {id} = streamValues[i]
+      for (let i = 0; i < streamArray?.length; i++) {
+        const {id} = streamArray[i]
         if (id === startId) {
-          return this.extractValues(streamValues.slice(i), endId)
+          return this.extractValues(streamArray.slice(i), endId)
         }
       }
 
   }
 
-  private extractValues (stream: {id: string, values: any[]}, endId: string) {
+  private extractValues (stream: any[], endId: string) {
+    console.log("STREAM", stream)
     const result = []
     let idx = 0
 
