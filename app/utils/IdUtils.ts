@@ -33,6 +33,14 @@ export default class IdUtils {
         
     }
 
+    /**
+     * Generate the sequence number for an ID with an explicit millisecond part
+     * and a wildcard sequence part.
+     *
+     * @param topId The latest ID already in the stream, or null for an empty stream.
+     * @param newId The new ID with a wildcard sequence, such as 1526919030474-*.
+     * @returns The new ID with the wildcard replaced by the generated sequence.
+     */
     static generateSequence(topId: string | null, newId: string): string {
         const [newMillisecondsPart] = newId.split("-")
         const newMilliseconds = parseInt(newMillisecondsPart)
@@ -52,6 +60,13 @@ export default class IdUtils {
         return `${newMillisecondsPart}-${sequence}`
     }
 
+    /**
+     * Generate a full stream ID for XADD * using the current millisecond part.
+     *
+     * @param existingId An existing stream ID with the same millisecond part, or null.
+     * @param millisecondsPart The Unix time in milliseconds to use as the ID time part.
+     * @returns The generated stream ID with an incremented sequence when needed.
+     */
     static autogenerateId(existingId: string | null, millisecondsPart: string): string {
         let sequence = 0
 

@@ -46,6 +46,9 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "XADD":
         connection.write(redisService.xadd(args))
         break
+      default:
+        connection.write(redisService.unknownCommand(command))
+        break
     }
   })
 });

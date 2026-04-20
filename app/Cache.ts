@@ -5,14 +5,14 @@ export default class Cache extends EventEmitter{
 
   private cache: Map<string, any> = new Map();
   private stream: Map<string, any> = new Map();
-  private requestQueue : Map<string, Array<() => void>> = new Map()
+
 
   private ITEM_ADDED = 'item added'
 
   constructor() {
     super();
 
-    this.handleDataAddedEvent()
+    // this.handleDataAddedEvent()
   }
 
   set(key: string, value: any, options: string[] = []) {
@@ -136,35 +136,35 @@ export default class Cache extends EventEmitter{
     return result
   }
 
-  blpop(key: string, timeout: number) : Promise<string[]> {
-    const value = this.lpop(key)
-    timeout = timeout * 1000 // for milliseconds for timeout
-    if (value && value.length > 0) {
-      return Promise.resolve([key, ...value])
-    }
+  // blpop(key: string, timeout: number) : Promise<string[]> {
+  //   const value = this.lpop(key)
+  //   timeout = timeout * 1000 // for milliseconds for timeout
+  //   if (value && value.length > 0) {
+  //     return Promise.resolve([key, ...value])
+  //   }
 
-    return new Promise<string[]>((resolve, reject) => {
-      const commandTimeout = setTimeout(() => {
-        if (timeout === 0.0) {
-          //wait indefinitely if timeout is 0
-          setTimeout(() => {})
-        } else {
-          return reject([key])
-        }
-      }, timeout)
+  //   return new Promise<string[]>((resolve, reject) => {
+  //     const commandTimeout = setTimeout(() => {
+  //       if (timeout === 0.0) {
+  //         //wait indefinitely if timeout is 0
+  //         setTimeout(() => {})
+  //       } else {
+  //         return reject([key])
+  //       }
+  //     }, timeout)
 
-      const command = () => {
-        const value = this.lpop(key) as []
-        clearTimeout(commandTimeout)
-        resolve([key, ...value])
-        return 
-      }
+  //     const command = () => {
+  //       const value = this.lpop(key) as []
+  //       clearTimeout(commandTimeout)
+  //       resolve([key, ...value])
+  //       return 
+  //     }
 
-      const commands = this.requestQueue.get(key) ?? []
-      commands.push(command)
-      this.requestQueue.set(key, commands)
-    })
-  }
+  //     const commands = this.requestQueue.get(key) ?? []
+  //     commands.push(command)
+  //     this.requestQueue.set(key, commands)
+  //   })
+  // }
 
   llen(key: string) : number {
     const values = this.cache.get(key)
@@ -179,16 +179,6 @@ export default class Cache extends EventEmitter{
     streamQueue.push({id: entryId, values: entries})
     this.stream.set(key, streamQueue)
     return entryId;
-  }
-
-  private handleDataAddedEvent() {
-    this.on(this.ITEM_ADDED, itemKey => {
-      if (this.requestQueue.has(itemKey)) {
-        const commands = this.requestQueue.get(itemKey)!
-        const nextCommand = commands.shift()!
-        nextCommand()
-      } 
-    })
   }
 
   private emitItemsAdded(key: string, itemCount: number) {

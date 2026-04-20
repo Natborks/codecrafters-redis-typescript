@@ -1,9 +1,16 @@
 import Cache from "./Cache";
 import Parser from "./parser/Parser";
 import IdUtils from "./utils/IdUtils";
+import ResponseUtils from "./utils/ResponseUtils";
 
 export default class RedisService {
   private cache = new Cache();
+  private requestQueue : Map<string, Array<() => void>> = new Map()
+  private ITEM_ADDED = 'item added'
+
+  constructor() {
+    this.handleDataAddedEvent()
+  }
 
   parse(data: string): string[] {
     const parser = new Parser(data);
@@ -11,17 +18,17 @@ export default class RedisService {
   }
 
   ping(): string {
-    return this.writeSimpleString("PONG");
+    return ResponseUtils.writeSimpleString("PONG");
   }
 
   echo(args: string[]): string {
-    return this.writeBulkString(args);
+    return ResponseUtils.writeBulkString(args);
   }
 
   set(args: string[]): string {
     const [key, val, ...options] = args;
     this.cache.set(key, val, options);
-    return this.writeSimpleString("OK");
+    return ResponseUtils.writeSimpleString("OK");
   }
 
   rpush(args: string[]): string {
@@ -39,13 +46,13 @@ export default class RedisService {
   get(args: string[]): string {
     const [query] = args;
     const result = this.cache.get(query);
-    return result ? this.writeBulkString([result]) : "$-1\r\n";
+    return result ? ResponseUtils.writeBulkString([result]) : "$-1\r\n";
   }
 
   lrange(args: string[]): string {
     const [key, startIdx, endIdx] = args;
     const values = this.cache.lrange(key, parseInt(startIdx), parseInt(endIdx));
-    return this.writeArrayString(values);
+    return ResponseUtils.writeArrayString(values);
   }
 
   llen(args: string[]): string {
@@ -64,15 +71,14 @@ export default class RedisService {
     }
 
     return elems.length === 1
-      ? this.writeBulkString(elems)
-      : this.writeArrayString(elems);
+      ? ResponseUtils.writeBulkString(elems)
+      : ResponseUtils.writeArrayString(elems);
   }
 
   async blpop(args: string[]): Promise<string> {
     try {
-      const [key, timeout] = args;
-      const result = await this.cache.blpop(key, parseFloat(timeout) * 1.0);
-      return this.writeArrayString(result);
+      const result = await this.getBlockingPopResult(args);
+      return ResponseUtils.writeArrayString(result);
     } catch {
       return "*-1\r\n";
     }
@@ -82,7 +88,7 @@ export default class RedisService {
     const [key] = args
     const type = this.cache.getType(key)
 
-    return this.writeSimpleString(type)
+    return ResponseUtils.writeSimpleString(type)
     
   }
 
@@ -106,49 +112,69 @@ export default class RedisService {
       const comp = IdUtils.validateId(topItemId, entryId)
 
       if (comp === 0) {
-        return this.writeSimpleError(
+        return ResponseUtils.writeSimpleError(
           "ERR The ID specified in XADD must be greater than 0-0"
         )
       }
 
       if (comp === -1) {
-        return this.writeSimpleError(
+        return ResponseUtils.writeSimpleError(
           "ERR The ID specified in XADD is equal or smaller than the target stream top item"
         )
       }
     }
 
     const result = this.cache.xadd(key, entryId, entries);
-    return this.writeBulkString([result]);
+    return ResponseUtils.writeBulkString([result]);
   }
 
   unknownCommand(command: string): string {
     return `-ERR unknown command '${command}'\r\n`;
   }
 
-  private writeSimpleString(value: string): string {
-    return `+${value}\r\n`;
-  }
+  private getBlockingPopResult(args: string[]): Promise<string[]> {
+    const [key, rawTimeout] = args;
+    const value = this.cache.lpop(key)
+    const timeout = parseFloat(rawTimeout) * 1000 // for milliseconds for timeout
 
-  private writeBulkString(args: string[]): string {
-    let response = "";
-    for (const literal of args) {
-      const length = literal.length;
-      response = response.concat(`$${length}\r\n${literal}\r\n`);
+    if (value && value.length > 0) {
+      return Promise.resolve([key, ...value])
     }
 
-    return response;
+    return new Promise<string[]>((resolve, reject) => {
+      const commandTimeout = setTimeout(() => {
+        if (timeout === 0.0) {
+          //wait indefinitely if timeout is 0
+          setTimeout(() => {})
+        } else {
+          return reject([key])
+        }
+      }, timeout)
+
+      const command = () => {
+        const value = this.cache.lpop(key) as []
+        clearTimeout(commandTimeout)
+        resolve([key, ...value])
+        return
+      }
+
+      const commands = this.requestQueue.get(key) ?? []
+      commands.push(command)
+      this.requestQueue.set(key, commands)
+    })
   }
 
-  private writeArrayString(args: string[]): string {
-    const response = this.writeBulkString(args);
-    return `*${args.length}\r\n${response}`;
-  }
-
-  private writeSimpleError(error: string): string {
-    return `-${error}\r\n`
+  private handleDataAddedEvent() {
+    this.cache.on(this.ITEM_ADDED, itemKey => {
+      if (this.requestQueue.has(itemKey)) {
+        const commands = this.requestQueue.get(itemKey)!
+        const nextCommand = commands.shift()!
+        nextCommand()
+      }
+    })
   }
 }
+
 
 console.log(IdUtils.validateId('1-2', '1-2'))
 // const redisService = new RedisService();
