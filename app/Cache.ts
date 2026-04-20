@@ -180,14 +180,6 @@ export default class Cache extends EventEmitter{
     return entryId;
   }
 
-  private emitItemsAdded(key: string, itemCount: number) {
-    if (itemCount === 0) return
-
-    setImmediate(() => {
-      this.emit(this.ITEM_ADDED, key, itemCount)
-    })
-  }
-
   xrange(key: string, startId: string, endId: string): Array<{id: string, values: string[]}> {
     const streamArray = this.stream.get(key)
     if (!streamArray) return []
@@ -200,13 +192,21 @@ export default class Cache extends EventEmitter{
     })
   }
 
-  // private handleSetCacheOptions(key: string, options: string[]) {
-  //   const [, delay] = options;
-  //   const interval = parseInt(delay);
-  //   setTimeout(() => {
-  //     this.cache.delete(key);
-  //   }, interval);
-  // }
+  private handleSetCacheOptions(key: string, options: string[]) {
+    const [, delay] = options;
+    const interval = parseInt(delay);
+    setTimeout(() => {
+      this.cache.delete(key);
+    }, interval);
+  }
+
+  private emitItemsAdded(key: string, itemCount: number) {
+    if (itemCount === 0) return
+
+    setImmediate(() => {
+      this.emit(this.ITEM_ADDED, key, itemCount)
+    })
+  }
 
   private normalizeIndices(startIdx: number, endIdx: number, values: any[]) : number[] {
      startIdx = startIdx >= 0 ? startIdx : Math.max(0, startIdx + values.length)
