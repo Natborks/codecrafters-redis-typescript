@@ -210,8 +210,9 @@ export default class Cache extends EventEmitter{
     let idx = 0
 
     do {
-      const {id, values} = stream[idx++]
+      const {id, values} = stream[idx]
       result.push([id, values])
+      idx++
     } while (stream[idx] != endId)
 
     return result
