@@ -196,7 +196,7 @@ export default class Cache extends EventEmitter{
       if (!streamValues) return 
 
       for (let i = 0; i < streamValues?.length; i++) {
-        const [id] = streamValues[i]
+        const {id} = streamValues[i]
         if (id === startId) {
           return this.extractValues(streamValues.slice(i), endId)
         }
@@ -213,7 +213,7 @@ export default class Cache extends EventEmitter{
 
     do {
       const currId = stream[idx++]
-      const [id, values] = stream
+      const {id, values} = stream
       result.push([id, values])
     } while (currId != endId)
 
