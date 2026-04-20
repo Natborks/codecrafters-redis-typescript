@@ -194,7 +194,7 @@ export default class Cache extends EventEmitter{
     //get index of first item. get index of second item. 
       const streamValues = this.stream.get(key)
       for (let i = 0; i < streamValues?.length; i++) {
-        console.log(streamValues[i])
+        console.log("STREAM VALUE", streamValues[i])
       }
       // for {key, value} in array
         //if 
