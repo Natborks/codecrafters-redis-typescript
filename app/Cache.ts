@@ -4,7 +4,7 @@ export default class Cache extends EventEmitter{
 
   private cache: Map<string, any> = new Map();
   //TODO: convert this to a sorted datatructure for easy querying
-  private stream: Map<string, any[]> = new Map();
+  private stream: Map<string, Array<{id: string, values: string[]}>> = new Map();
 
 
   private ITEM_ADDED = 'item added'
@@ -78,7 +78,6 @@ export default class Cache extends EventEmitter{
   getTopItem(key: string): any {
     const topItemList = this.stream.get(key)
     if(!topItemList) return null
-    console.log(topItemList)
     const topItem = topItemList[topItemList.length - 1]
     return topItem['id']
   }
@@ -189,32 +188,16 @@ export default class Cache extends EventEmitter{
     })
   }
 
-  xrange(key: string, startId: string, endId: string) {
-    //get array for key
-    //get index of first item. get index of second item. 
-      const streamArray = this.stream.get(key)
-      if (!streamArray) return 
+  xrange(key: string, startId: string, endId: string): Array<{id: string, values: string[]}> {
+    const streamArray = this.stream.get(key)
+    if (!streamArray) return []
 
-      for (let i = 0; i < streamArray?.length; i++) {
-        const {id} = streamArray[i]
-        if (id === startId) {
-          return this.extractValues(streamArray.slice(i), endId)
-        }
-      }
+    return streamArray.filter(({id: currentId}) => {
+      const isAfterStart =  this.compareStreamIds(startId, currentId)
+      const isBeforeEnd = this.compareStreamIds(currentId, endId)
 
-  }
-
-  private extractValues (stream: any[], endId: string) {
-    console.log("STREAM", stream)
-    const result = []
-    let idx = 0
-
-    do {
-      const {id, values} = stream[idx++]
-      result.push([id, values])
-    } while (stream[idx++] != endId)
-
-    return result
+      return isAfterStart && isBeforeEnd
+    })
   }
 
   // private handleSetCacheOptions(key: string, options: string[]) {
@@ -231,5 +214,21 @@ export default class Cache extends EventEmitter{
      endIdx = endIdx >= 0 ? endIdx : Math.max(0, endIdx + values.length)
 
      return [startIdx, endIdx]
+  }
+
+  private compareStreamIds(leftId: string, rightId: string): boolean {
+    const [leftMillisecondsPart, leftSequencePart] = leftId.split("-")
+    const [rightMillisecondsPart, rightSequencePart] = rightId.split("-")
+
+    const leftMilliseconds = parseInt(leftMillisecondsPart)
+    const rightMilliseconds = parseInt(rightMillisecondsPart)
+
+    if (leftMilliseconds - rightMilliseconds > 0) return false
+
+    if (leftMilliseconds === rightMilliseconds)  {
+      return rightSequencePart >= leftSequencePart
+    }
+
+    return false 
   }
 }
