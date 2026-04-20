@@ -202,9 +202,6 @@ export default class Cache extends EventEmitter{
         }
       }
 
-      
-      // for {key, value} in array
-        //if 
   }
 
   private extractValues (stream: {id: string, values: any[]}, endId: string) {
@@ -215,7 +212,7 @@ export default class Cache extends EventEmitter{
       const currId = stream[idx++]
       const {id, values} = stream
       result.push([id, values])
-    } while (currId != endId)
+    } while (stream[idx] != endId)
 
     return result
   }
