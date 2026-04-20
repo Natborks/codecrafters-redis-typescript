@@ -128,6 +128,14 @@ export default class RedisService {
     return ResponseUtils.writeBulkString([result]);
   }
 
+  xrange(args: string[]): string {
+    const [key, startId, endId] = args
+
+    const result = this.cache.xrange(key, startId, endId)
+
+    return "string"
+  }
+
   unknownCommand(command: string): string {
     return `-ERR unknown command '${command}'\r\n`;
   }

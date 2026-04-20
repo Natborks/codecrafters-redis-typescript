@@ -1,10 +1,10 @@
 import {EventEmitter} from 'node:events'
 
-//TODO: There's too much domain logic in this layer. Refactor into Service layer
 export default class Cache extends EventEmitter{
 
   private cache: Map<string, any> = new Map();
-  private stream: Map<string, any> = new Map();
+  //TODO: convert this to a sorted datatructure for easy querying
+  private stream: Map<string, any[]> = new Map();
 
 
   private ITEM_ADDED = 'item added'
@@ -189,13 +189,24 @@ export default class Cache extends EventEmitter{
     })
   }
 
-  private handleSetCacheOptions(key: string, options: string[]) {
-    const [, delay] = options;
-    const interval = parseInt(delay);
-    setTimeout(() => {
-      this.cache.delete(key);
-    }, interval);
+  xrange(key: string, startId: string, endId: string) {
+    //get array for key
+    //get index of first item. get index of second item. 
+      const streamValues = this.stream.get(key)
+      for (let i = 0; i < streamValues?.length; i++) {
+        console.log(streamValues[i])
+      }
+      // for {key, value} in array
+        //if 
   }
+
+  // private handleSetCacheOptions(key: string, options: string[]) {
+  //   const [, delay] = options;
+  //   const interval = parseInt(delay);
+  //   setTimeout(() => {
+  //     this.cache.delete(key);
+  //   }, interval);
+  // }
 
   private normalizeIndices(startIdx: number, endIdx: number, values: any[]) : number[] {
      startIdx = startIdx >= 0 ? startIdx : Math.max(0, startIdx + values.length)
