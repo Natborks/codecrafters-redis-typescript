@@ -23,7 +23,6 @@ export default class Parser {
     }
 
     getParsedString() {
-        console.log("Parsed: ",this.#parsedData)
         return this.#parsedData
     }
 
