@@ -50,7 +50,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         connection.write(redisService.xrange(args))
         break
       case "XREAD":
-        connection.write(redisService.xread(args))
+        connection.write(await redisService.xread(args))
         break
       default:
         connection.write(redisService.unknownCommand(command))

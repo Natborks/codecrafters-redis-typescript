@@ -140,7 +140,7 @@ export default class RedisService {
     return ResponseUtils.writeArrayString(result)
   }
 
-  xread(args: string[]): Promise<string> {
+  async xread(args: string[]): Promise<string> {
     const [block, milliseconds, streams, ...rest] = args
     let delay = parseFloat(milliseconds) * 1000
 
