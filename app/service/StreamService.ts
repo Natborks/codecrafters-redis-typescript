@@ -1,6 +1,6 @@
-import Store from "./Store";
-import IdUtils from "./utils/IdUtils";
-import ResponseUtils from "./utils/ResponseUtils";
+import Store from "../Store";
+import IdUtils from "../utils/IdUtils";
+import ResponseUtils from "../utils/ResponseUtils";
 
 export default class StreamService {
   private streamRequestQueue : Map<string, Array<() => void>> = new Map()

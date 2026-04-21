@@ -1,8 +1,8 @@
 import * as net from "net";
 import Parser from "./parser/Parser";
 import Store from "./Store";
-import StreamService from "./StreamService";
-import StringService from "./StringService";
+import StreamService from "./service/StreamService";
+import StringService from "./service/StringService";
 
 const store = new Store();
 const stringService = new StringService(store);

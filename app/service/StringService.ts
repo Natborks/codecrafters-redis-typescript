@@ -1,5 +1,5 @@
-import Store from "./Store";
-import ResponseUtils from "./utils/ResponseUtils";
+import Store from "../Store";
+import ResponseUtils from "../utils/ResponseUtils";
 
 export default class StringService {
   private requestQueue : Map<string, Array<() => void>> = new Map()
