@@ -171,33 +171,17 @@ export default class RedisService {
 
   private getBlockingPopResult(args: string[]): Promise<string[]> {
     const [key, rawTimeout] = args;
-    const value = this.store.lpop(key)
     const timeout = parseFloat(rawTimeout) * 1000 // for milliseconds for timeout
 
-    if (value && value.length > 0) {
-      return Promise.resolve([key, ...value])
-    }
-
-    return new Promise<string[]>((resolve, reject) => {
-      const commandTimeout = setTimeout(() => {
-        if (timeout === 0.0) {
-          //wait indefinitely if timeout is 0
-          setTimeout(() => {})
-        } else {
-          return reject([key])
-        }
-      }, timeout)
-
-      const command = () => {
-        const value = this.store.lpop(key) as []
-        clearTimeout(commandTimeout)
-        resolve([key, ...value])
-        return
-      }
-
-      const commands = this.requestQueue.get(key) ?? []
-      commands.push(command)
-      this.requestQueue.set(key, commands)
+    return this.waitForResult({
+      queueKey: key,
+      queueMap: this.requestQueue,
+      timeout,
+      getResult: () => {
+        const value = this.store.lpop(key)
+        return value ? [key, ...value] : []
+      },
+      hasResult: (value) => value.length > 0,
     })
   }
 
@@ -226,32 +210,59 @@ export default class RedisService {
 
     const [block, milliseconds, streams, ...rest] = args
     let delay = parseFloat(milliseconds)
-    console.log("DELAY: ", delay)
 
-    const data = getResponse(rest)
-
-    if(data && data.length > 1) {
-      return Promise.resolve(data)
-    }
-
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject("*-1\r\n")
-      }, delay)
-
-      const command = () => {
-        const data = getResponse(rest)
-        clearTimeout(timeout)
-        return resolve(data)
-      }
-
-      const streamKey = rest[0]
-      const stream = this.streamRequestQueue.get(streamKey) || []
-      stream.push(command)
-      this.streamRequestQueue.set(streamKey, stream)
+    return this.waitForResult({
+      queueKey: rest[0],
+      queueMap: this.streamRequestQueue,
+      timeout: delay,
+      getResult: () => getResponse(rest),
+      hasResult: (data) => data.length > 1,
     })
  
   }
+
+  private waitForResult<T>({
+    queueKey,
+    queueMap,
+    timeout,
+    getResult,
+    hasResult,
+  }: {
+    queueKey: string,
+    queueMap: Map<string, Array<() => void>>,
+    timeout: number,
+    getResult: () => T,
+    hasResult: (result: T) => boolean,
+  }): Promise<T> {
+    const result = getResult()
+
+    if (hasResult(result)) {
+      return Promise.resolve(result)
+    }
+
+    return new Promise<T>((resolve, reject) => {
+      const commandTimeout = timeout === 0
+        ? undefined
+        : setTimeout(() => reject(), timeout)
+
+      const command = () => {
+        const nextResult = getResult()
+
+        if (!hasResult(nextResult)) return
+
+        if (commandTimeout) {
+          clearTimeout(commandTimeout)
+        }
+
+        resolve(nextResult)
+      }
+
+      const commands = queueMap.get(queueKey) ?? []
+      commands.push(command)
+      queueMap.set(queueKey, commands)
+    })
+  }
+
   private registerQueueDrain(
     eventName: string,
     queueMap: Map<string, Array<() => void>>,
