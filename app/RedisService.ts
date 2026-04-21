@@ -139,7 +139,6 @@ export default class RedisService {
   }
 
   xread(args: string[]): string {
-    console.log("ARGS: ", args)
     const [, ...rest] = args
 
     let start = 0
@@ -148,6 +147,7 @@ export default class RedisService {
 
     while (end > start) {
       const res = this.store.xread(rest[start], rest[end])
+      console.log("REWS", res)
       result.push(res)
       start++
       end--
