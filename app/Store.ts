@@ -70,6 +70,10 @@ export default class Store extends EventEmitter{
   incr(key: string): number {
     const value = this.cache.get(key)
 
+    if (Number.isNaN(value)) {
+      throw new Error("ERR value is not an integer or out of range")
+    }
+
     if (value === undefined) {
       this.cache.set(key, "1")
       return 1

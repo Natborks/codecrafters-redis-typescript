@@ -48,10 +48,6 @@ export default class StringService {
       const value = this.store.incr(key)
       return ResponseUtils.writeInteger(value)
     } catch (error) {
-      if (error instanceof Error) {
-        return ResponseUtils.writeSimpleError(error.message)
-      }
-
       return ResponseUtils.writeSimpleError("ERR value is not an integer or out of range")
     }
   }
