@@ -1,4 +1,4 @@
-import Store from "./Cache";
+import Store from "./Store";
 import Parser from "./parser/Parser";
 import IdUtils from "./utils/IdUtils";
 import ResponseUtils from "./utils/ResponseUtils";
