@@ -161,6 +161,7 @@ export default class Store extends EventEmitter{
 
   xread(key: string, startId: string): Array<{id: string, values: string[]}>{
     const streamArray = this.stream.get(key)
+    console.log("STREAM ARRAY", streamArray)
     if (!streamArray) return []
 
     return streamArray
