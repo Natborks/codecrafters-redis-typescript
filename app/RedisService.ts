@@ -150,7 +150,7 @@ export default class RedisService {
 
     const data = this.handleXread(rest)
 
-    if(data.length > 1) {
+    if(data && data.length > 1) {
       return Promise.resolve(ResponseUtils.writeArrayString(data))
     }
 
