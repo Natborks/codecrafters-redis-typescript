@@ -1,10 +1,10 @@
-import Cache from "./Cache";
+import Store from "./Cache";
 import Parser from "./parser/Parser";
 import IdUtils from "./utils/IdUtils";
 import ResponseUtils from "./utils/ResponseUtils";
 
 export default class RedisService {
-  private cache = new Cache();
+  private store = new Store();
   private requestQueue : Map<string, Array<() => void>> = new Map()
   private ITEM_ADDED = 'item added'
 
@@ -27,44 +27,44 @@ export default class RedisService {
 
   set(args: string[]): string {
     const [key, val, ...options] = args;
-    this.cache.set(key, val, options);
+    this.store.set(key, val, options);
     return ResponseUtils.writeSimpleString("OK");
   }
 
   rpush(args: string[]): string {
     const [key, ...values] = args;
-    const count = this.cache.rpush(key, values);
+    const count = this.store.rpush(key, values);
     return `:${count}\r\n`;
   }
 
   lpush(args: string[]): string {
     const [key, ...values] = args;
-    const count = this.cache.lpush(key, values);
+    const count = this.store.lpush(key, values);
     return `:${count}\r\n`;
   }
 
   get(args: string[]): string {
     const [query] = args;
-    const result = this.cache.get(query);
+    const result = this.store.get(query);
     return result ? ResponseUtils.writeBulkString([result]) : "$-1\r\n";
   }
 
   lrange(args: string[]): string {
     const [key, startIdx, endIdx] = args;
-    const values = this.cache.lrange(key, parseInt(startIdx), parseInt(endIdx));
+    const values = this.store.lrange(key, parseInt(startIdx), parseInt(endIdx));
     return ResponseUtils.writeArrayString(values);
   }
 
   llen(args: string[]): string {
     const [key] = args;
-    const count = this.cache.llen(key);
+    const count = this.store.llen(key);
     return `:${count}\r\n`;
   }
 
   lpop(args: string[]): string {
     const [key, numItems] = args;
     const count = numItems === undefined ? undefined : parseInt(numItems);
-    const elems = this.cache.lpop(key, count);
+    const elems = this.store.lpop(key, count);
 
     if (elems === null) {
       return "$-1\r\n";
@@ -87,7 +87,7 @@ export default class RedisService {
   async getType(args: string[]) {
     const [key] = args
 
-    return ResponseUtils.writeSimpleString(this.cache.getType(key))
+    return ResponseUtils.writeSimpleString(this.store.getType(key))
     
   }
 
@@ -95,12 +95,12 @@ export default class RedisService {
     const [key, rawEntryId, ...entries] = args;
     let entryId = rawEntryId
     
-    const topItemId = this.cache.getTopItem(key)
+    const topItemId = this.store.getTopItem(key)
     
 
     if (entryId === "*") {
       const millisecondsPart = Date.now().toString()
-      const streamObj = this.cache.hasStreamObj(key, millisecondsPart)
+      const streamObj = this.store.hasStreamObj(key, millisecondsPart)
       entryId = IdUtils.autogenerateId(streamObj, millisecondsPart)
     } else {
       const [, sequence] = entryId.split("-")
@@ -123,14 +123,14 @@ export default class RedisService {
       }
     }
 
-    const result = this.cache.xadd(key, entryId, entries);
+    const result = this.store.xadd(key, entryId, entries);
     return ResponseUtils.writeBulkString([result]);
   }
 
   xrange(args: string[]): string {
     const [key, startId, endId] = args
 
-    const result = this.cache.xrange(key, startId, endId)
+    const result = this.store.xrange(key, startId, endId)
 
     return ResponseUtils.writeStreamArray(result)
   }
@@ -141,7 +141,7 @@ export default class RedisService {
 
   private getBlockingPopResult(args: string[]): Promise<string[]> {
     const [key, rawTimeout] = args;
-    const value = this.cache.lpop(key)
+    const value = this.store.lpop(key)
     const timeout = parseFloat(rawTimeout) * 1000 // for milliseconds for timeout
 
     if (value && value.length > 0) {
@@ -159,7 +159,7 @@ export default class RedisService {
       }, timeout)
 
       const command = () => {
-        const value = this.cache.lpop(key) as []
+        const value = this.store.lpop(key) as []
         clearTimeout(commandTimeout)
         resolve([key, ...value])
         return
@@ -172,7 +172,7 @@ export default class RedisService {
   }
 
   private handleDataAddedEvent() {
-    this.cache.on(this.ITEM_ADDED, itemKey => {
+    this.store.on(this.ITEM_ADDED, itemKey => {
       if (this.requestQueue.has(itemKey)) {
         const commands = this.requestQueue.get(itemKey)!
         const nextCommand = commands.shift()!

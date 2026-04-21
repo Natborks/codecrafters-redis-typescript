@@ -1,7 +1,7 @@
 import {EventEmitter} from 'node:events'
 import StreamId from './types/StreamId';
 
-export default class Cache extends EventEmitter{
+export default class Store extends EventEmitter{
  
   private cache: Map<string, any> = new Map();
   //TODO: convert this to a sorted datatructure for easy querying
@@ -74,11 +74,11 @@ export default class Cache extends EventEmitter{
     return response
   }
 
-  getTopItem(key: string): any {
+  getTopItem(key: string): string | null {
     const topItemList = this.stream.get(key)
     if(!topItemList) return null
     const topItem = topItemList[topItemList.length - 1]
-    return topItem['id']
+    return topItem['id'].toString()
   }
 
   hasStreamObj(key: string, millisecondsPart: string): string | null {
