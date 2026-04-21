@@ -143,7 +143,7 @@ export default class RedisService {
 
     const result = this.store.xread(key, startPoint)
     console.log("result: ", result)
-    return ResponseUtils.writeArrayString([key, result])
+    return ResponseUtils.writeArrayString([[key, result]])
   }
 
   unknownCommand(command: string): string {
