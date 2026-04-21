@@ -149,6 +149,9 @@ export default class Store extends EventEmitter{
     const streamArray = this.stream.get(key)
     if (!streamArray) return []
 
+    startId === "-" ? streamArray[0].id.toString() : startId
+    endId   === "+" ? streamArray[streamArray.length - 1].id.toString() : endId
+    
     return streamArray.filter(({id: currentId}) => 
       currentId.gte(new StreamId(startId)) && 
       currentId.lte(new StreamId(endId))
