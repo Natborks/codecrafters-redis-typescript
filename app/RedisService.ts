@@ -11,8 +11,8 @@ export default class RedisService {
   private STREAM_ITEM_ADDED = 'strea item added'
 
   constructor() {
-    this.handleDataAddedEvent()
-    this.handleStreamItemAdded()
+    this.registerQueueDrain(this.ITEM_ADDED, this.requestQueue)
+    this.registerQueueDrain(this.STREAM_ITEM_ADDED, this.streamRequestQueue)
   }
 
   parse(data: string): string[] {
@@ -219,7 +219,6 @@ export default class RedisService {
       return result
     }
 
-    console.log("ARGS: ", args)
     if (args[0] !== "block") {
       const [, ...rest] = args
       return Promise.resolve(getResponse(rest))
@@ -253,25 +252,19 @@ export default class RedisService {
     })
  
   }
+  private registerQueueDrain(
+    eventName: string,
+    queueMap: Map<string, Array<() => void>>,
+  ) {
+    this.store.on(eventName, ([type, itemKey]) => {
+      if (!queueMap.has(itemKey)) return
 
+      const commands = queueMap.get(itemKey)
+      const nextCommand = commands?.shift()
 
-  private handleDataAddedEvent() {
-    this.store.on(this.ITEM_ADDED, ([type, itemKey]) => {
-      if (this.requestQueue.has(itemKey)) {
-        const commands = this.requestQueue.get(itemKey)!
-        const nextCommand = commands.shift()!
-        nextCommand()
-      }
-    })
-  }
+      if (!nextCommand) return
 
-  private handleStreamItemAdded() {
-    this.store.on(this.STREAM_ITEM_ADDED, ([type, itemKey]) => {
-      if (this.streamRequestQueue.has(itemKey)) {
-        const commands = this.streamRequestQueue.get(itemKey)
-        const nextCommand = commands?.shift()!
-        nextCommand()
-      }
+      nextCommand()
     })
   }
 }
