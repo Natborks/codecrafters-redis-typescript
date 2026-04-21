@@ -20,7 +20,7 @@ export default class ResponseUtils {
       if (Array.isArray(item)) {
         response.concat(ResponseUtils.writeArrayString(item))
       } else if (Object.prototype.toString.call(item) === '[object Object]') {
-        this.writeArrayString(Object.entries(item))
+        response.concat(this.writeArrayString(Object.entries(item)))
       } 
       else {
         response.concat(this.writeBulkString([item]))
