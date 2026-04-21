@@ -14,7 +14,7 @@ export default class ResponseUtils {
   }
 
   static writeArrayString(args: any[]): string {
-    let response = `*${args.length}\r\n` 
+    let response = `` 
 
     console.log("ARGS: ",args)
     for (const item of args) {
