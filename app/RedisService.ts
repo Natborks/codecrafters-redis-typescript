@@ -1,16 +1,18 @@
 import Store from "./Store";
 import Parser from "./parser/Parser";
-import StreamId from "./types/StreamId";
 import IdUtils from "./utils/IdUtils";
 import ResponseUtils from "./utils/ResponseUtils";
 
 export default class RedisService {
   private store = new Store();
   private requestQueue : Map<string, Array<() => void>> = new Map()
+  private streamRequestQueue : Map<string, Array<() => void>> = new Map()
   private ITEM_ADDED = 'item added'
+  private STREAM_ITEM_ADDED = 'strea item added'
 
   constructor() {
     this.handleDataAddedEvent()
+    this.handleStreamItemAdded()
   }
 
   parse(data: string): string[] {
@@ -138,23 +140,48 @@ export default class RedisService {
     return ResponseUtils.writeArrayString(result)
   }
 
-  xread(args: string[]): string {
-    const [, ...rest] = args
+  xread(args: string[]): Promise<string> {
+    const [block, milliseconds, streams, ...rest] = args
+    let delay = parseFloat(milliseconds) * 1000
 
-    let key = 0
-    let id = rest.length / 2
-    const result = []
+    const data = this.handleXread(rest)
 
-    while (id < rest.length) {
-      const streamKey = rest[key]
-      const startId = rest[id]
-      const res = this.store.xread(streamKey, startId)
-      result.push([streamKey, res])
-      key++
-      id++
+    if(data.length > 1) {
+      return Promise.resolve(ResponseUtils.writeArrayString(data))
     }
+
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject("*-1\r\n")
+      }, delay)
+
+      const command = () => {
+        const data = this.handleXread(rest)
+        clearTimeout(timeout)
+        return resolve(ResponseUtils.writeArrayString(data))
+      }
+
+      const streamKey = rest[0]
+      const stream = this.streamRequestQueue.get(streamKey) || []
+      stream.push(command)
+      this.streamRequestQueue.set(streamKey, stream)
+    })
+
+
+    // let key = 0
+    // let id = rest.length / 2
+    // const result = []
+
+    // while (id < rest.length) {
+    //   const streamKey = rest[key]
+    //   const startId = rest[id]
+    //   const res = this.store.xread(streamKey, startId)
+    //   result.push([streamKey, res])
+    //   key++
+    //   id++
+    // }
     
-    return ResponseUtils.writeArrayString(result)
+    // return ResponseUtils.writeArrayString(result)
   }
 
   unknownCommand(command: string): string {
@@ -193,11 +220,37 @@ export default class RedisService {
     })
   }
 
+  private handleXread(args: string[]) : any[]{
+      let key = 0
+      let id = args.length / 2
+      const result = []
+
+      while (id < args.length) {
+        const streamKey = args[key]
+        const startId = args[id]
+        const res = this.store.xread(streamKey, startId)
+        result.push([streamKey, res])
+        key++
+        id++
+      }
+
+      return result
+  }
   private handleDataAddedEvent() {
-    this.store.on(this.ITEM_ADDED, itemKey => {
+    this.store.on(this.ITEM_ADDED, ([type, itemKey]) => {
       if (this.requestQueue.has(itemKey)) {
         const commands = this.requestQueue.get(itemKey)!
         const nextCommand = commands.shift()!
+        nextCommand()
+      }
+    })
+  }
+
+  private handleStreamItemAdded() {
+    this.store.on(this.STREAM_ITEM_ADDED, ([type, itemKey]) => {
+      if (this.streamRequestQueue.has(itemKey)) {
+        const commands = this.streamRequestQueue.get(itemKey)
+        const nextCommand = commands?.shift()!
         nextCommand()
       }
     })

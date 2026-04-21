@@ -9,6 +9,7 @@ export default class Store extends EventEmitter{
 
 
   private ITEM_ADDED = 'item added'
+  private STREAM_ITEM_ADDED = 'strea item added'
 
   constructor() {
     super();
@@ -142,6 +143,7 @@ export default class Store extends EventEmitter{
     const streamQueue = this.stream.get(key) ?? []
     streamQueue.push({id: new StreamId(entryId), values: entries})
     this.stream.set(key, streamQueue)
+    this.emit(this.STREAM_ITEM_ADDED, ["streamKey", key])
     return entryId;
   }
 
@@ -180,7 +182,7 @@ export default class Store extends EventEmitter{
     if (itemCount === 0) return
 
     setImmediate(() => {
-      this.emit(this.ITEM_ADDED, key, itemCount)
+      this.emit(this.ITEM_ADDED, ["key", key])
     })
   }
 
