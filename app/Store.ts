@@ -151,13 +151,21 @@ export default class Store extends EventEmitter{
 
     startId = startId === "-" ? streamArray[0].id.toString() : startId
     endId = endId   === "+" ? streamArray[streamArray.length - 1].id.toString() : endId
-    console.log("STAR-ID", "END-ID ", startId, endId)
     return streamArray.filter(({id: currentId}) => 
       currentId.gte(new StreamId(startId)) && 
       currentId.lte(new StreamId(endId))
     ).map(({id, values}) => {
       return {id: id.toString(), values}
     })
+  }
+
+  xread(key: string, startId: string): Array<{id: string, values: string[]}>{
+    const streamArray = this.stream.get(key)
+    if (!streamArray) return []
+
+    return streamArray
+        .filter(({id}) => id.compareTo(new StreamId(startId)) === 1)
+        .map(({id, values}) => { return {id: id.toString(), values} })
   }
 
   private handleSetCacheOptions(key: string, options: string[]) {

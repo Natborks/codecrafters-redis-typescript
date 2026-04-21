@@ -91,6 +91,8 @@ export default class RedisService {
     
   }
 
+  //STREAM COMMANDS
+
   xadd(args: string[]): string {
     const [key, rawEntryId, ...entries] = args;
     let entryId = rawEntryId
@@ -133,6 +135,13 @@ export default class RedisService {
     const result = this.store.xrange(key, startId, endId)
 
     return ResponseUtils.writeStreamArray(result)
+  }
+
+  xread(args: string[]): string {
+    const [, key, startPoint] = args
+
+    const result = this.store.xread(key, startPoint)
+    return ResponseUtils.writeStreamArray(result, key)
   }
 
   unknownCommand(command: string): string {

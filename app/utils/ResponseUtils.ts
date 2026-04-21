@@ -18,8 +18,15 @@ export default class ResponseUtils {
     return `*${args.length}\r\n${response}`;
   }
 
-  static writeStreamArray(args: Array<{id: string, values: string[]}>): string {
-    let response = `*${args.length}\r\n`
+  static writeStreamArray(
+    args: Array<{id: string, values: string[]}>,
+    key: string = "", 
+  ): string {
+    let response = ""
+    if (key) {
+      response = `*1\r\n*2\r\n$${this.writeBulkString([key])}\r\n*1\r\n`
+    }
+    response.concat(`*${args.length}\r\n`)
 
     for (const {id, values} of args) {
       response = response.concat("*2\r\n")
