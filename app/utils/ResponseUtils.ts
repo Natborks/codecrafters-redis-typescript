@@ -16,6 +16,7 @@ export default class ResponseUtils {
   static writeArrayString(args: any[]): string {
     let response = `*${args.length}\r\n` 
 
+    console.log("ARGS: ",args)
     for (const item of args) {
       if (Array.isArray(item)) {
         response = response.concat(ResponseUtils.writeArrayString(item))
