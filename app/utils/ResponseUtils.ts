@@ -14,11 +14,11 @@ export default class ResponseUtils {
   }
 
   static writeArrayString(args: any[]): string {
-    const response = `*${args.length}\r\n` 
+    let response = `*${args.length}\r\n` 
 
     for (const item of args) {
       if (Array.isArray(item)) {
-        response.concat(ResponseUtils.writeArrayString(item))
+        response = response.concat(ResponseUtils.writeArrayString(item))
       } else if (Object.prototype.toString.call(item) === '[object Object]') {
         response.concat(this.writeArrayString(Object.entries(item)))
       } 
