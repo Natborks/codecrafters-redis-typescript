@@ -88,8 +88,6 @@ export default class StreamService {
     const [block, milliseconds, streams, ...rest] = args
     let delay = parseFloat(milliseconds)
 
-    console.log("DELAY: ", delay)
-
     const data = getResponse(rest)
 
     if(data && data.length > 1) {
@@ -98,7 +96,11 @@ export default class StreamService {
 
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject("*-1\r\n")
+        if (delay === 0) {
+          setTimeout(() => {}, 0)
+        } else {
+          reject("*-1\r\n")
+        }
       }, delay)
 
       const command = () => {
