@@ -138,6 +138,7 @@ export default class RedisService {
   }
 
   xread(args: string[]): string {
+    console.log("ARGS: ", args)
     const [, key, startPoint] = args
 
     const result = this.store.xread(key, startPoint)
