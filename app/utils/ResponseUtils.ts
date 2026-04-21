@@ -31,4 +31,8 @@ export default class ResponseUtils {
   static writeSimpleError(error: string): string {
     return `-${error}\r\n`
   }
+
+  static writeInteger(value: number): string {
+    return `:${value}\r\n`
+  }
 }

@@ -67,6 +67,20 @@ export default class Store extends EventEmitter{
     return this.cache.get(key);
   }
 
+  incr(key: string): number {
+    const value = this.cache.get(key)
+
+    if (value === undefined) {
+      this.cache.set(key, "1")
+      return 1
+    }
+
+    const incrementedValue = Number(value) + 1
+
+    this.cache.set(key, incrementedValue.toString())
+    return incrementedValue
+  }
+
   getType(key: string): string {
     const response = this.cache.has(key) ?
       "string" :

@@ -43,6 +43,9 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "GET":
         connection.write(stringService.get(args))
         break
+      case "INCR":
+        connection.write(stringService.incr(args))
+        break
       case "LRANGE":
         connection.write(stringService.lrange(args))
         break

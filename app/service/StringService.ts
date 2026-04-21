@@ -41,6 +41,21 @@ export default class StringService {
     return result ? ResponseUtils.writeBulkString([result]) : "$-1\r\n";
   }
 
+  incr(args: string[]): string {
+    const [key] = args;
+
+    try {
+      const value = this.store.incr(key)
+      return ResponseUtils.writeInteger(value)
+    } catch (error) {
+      if (error instanceof Error) {
+        return ResponseUtils.writeSimpleError(error.message)
+      }
+
+      return ResponseUtils.writeSimpleError("ERR value is not an integer or out of range")
+    }
+  }
+
   lrange(args: string[]): string {
     const [key, startIdx, endIdx] = args;
     const values = this.store.lrange(key, parseInt(startIdx), parseInt(endIdx));
