@@ -28,34 +28,6 @@ export default class ResponseUtils {
     return `*${args.length}\r\n${response}`;
   }
 
-  static writeStreamArray(
-    // args: Array<{id: string, values: string[]}>,
-    args: any[],
-  ): string {
-    let response = ""
-    response.concat(`*1\r\n`)
-    // if (key) {
-    //   response = `*1\r\n*2\r\n${this.writeBulkString([key])}\r\n*1`
-    // }
-    // response.concat(`*${args.length}\r\n`)
-
-    // for (const {id, values} of args) {
-    //   response = response.concat("*2\r\n")
-    //   response = response.concat(ResponseUtils.writeBulkString([id]))
-    //   response = response.concat(ResponseUtils.writeArrayString(values))
-    // }
-
-    for (const item in args) {
-      if (Array.isArray(item)) {
-        response.concat(this.writeArrayString(item))
-      } else if (typeof item === "string") {
-        response.concat(this.writeBulkString([item]))
-      }
-
-    }
-    return response
-  }
-
   static writeSimpleError(error: string): string {
     return `-${error}\r\n`
   }
