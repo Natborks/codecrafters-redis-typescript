@@ -164,6 +164,12 @@ export default class Store extends EventEmitter{
   xread(key: string, startId: string): Array<{id: string, values: string[]}>{
     const streamArray = this.stream.get(key)
     if (!streamArray) return []
+   
+    
+    if (startId === "$") {
+      const lastItem = streamArray[streamArray.length - 1]
+      return [{id: lastItem.id.toString(), values: lastItem.values}]
+    }
 
     return streamArray
         .filter(({id}) => id.compareTo(new StreamId(startId)) === 1)
