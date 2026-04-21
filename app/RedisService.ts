@@ -151,7 +151,7 @@ export default class RedisService {
       result.push(res)
     }
     
-    return ResponseUtils.writeArrayString([[result]])
+    return ResponseUtils.writeArrayString([result])
   }
 
   unknownCommand(command: string): string {
