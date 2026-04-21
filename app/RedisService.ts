@@ -221,7 +221,8 @@ export default class RedisService {
 
 
     if (args[0] !== "BLOCK") {
-      return Promise.resolve(args)
+      const [, ...rest] = args
+      return Promise.resolve(rest)
     }
 
     const [block, milliseconds, streams, ...rest] = args
