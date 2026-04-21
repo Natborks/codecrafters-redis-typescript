@@ -1,59 +1,74 @@
 import * as net from "net";
-import RedisService from "./RedisService";
+import Parser from "./parser/Parser";
+import Store from "./Store";
+import StreamService from "./StreamService";
+import StringService from "./StringService";
 
-const redisService = new RedisService();
+const store = new Store();
+const stringService = new StringService(store);
+const streamService = new StreamService(store);
+
+const parse = (data: string): string[] => {
+  const parser = new Parser(data);
+  return parser.getParsedString();
+}
+
+const unknownCommand = (command: string): string => {
+  return `-ERR unknown command '${command}'\r\n`;
+}
+
 // Uncomment the code below to pass the first stage
 const server: net.Server = net.createServer((connection: net.Socket) => {
   // Handle connection
   connection.on('data', async (data: Buffer) => {
-    const [command, ...args] = redisService.parse(data.toString());
+    const [command, ...args] = parse(data.toString());
     if (!command) throw new Error("Command not found")
 
     switch (command.toUpperCase()){
       case "PING":
-        connection.write(redisService.ping())
+        connection.write(stringService.ping())
         break
       case "ECHO":
-        connection.write(redisService.echo(args))
+        connection.write(stringService.echo(args))
         break
       case "SET":
-        connection.write(redisService.set(args))
+        connection.write(stringService.set(args))
         break
       case "RPUSH":
-        connection.write(redisService.rpush(args))
+        connection.write(stringService.rpush(args))
         break
       case "LPUSH":
-        connection.write(redisService.lpush(args))
+        connection.write(stringService.lpush(args))
         break
       case "GET":
-        connection.write(redisService.get(args))
+        connection.write(stringService.get(args))
         break
       case "LRANGE":
-        connection.write(redisService.lrange(args))
+        connection.write(stringService.lrange(args))
         break
       case "LLEN":
-        connection.write(redisService.llen(args))
+        connection.write(stringService.llen(args))
         break
       case "LPOP":
-        connection.write(redisService.lpop(args))
+        connection.write(stringService.lpop(args))
         break
       case "BLPOP":
-        connection.write(await redisService.blpop(args))
+        connection.write(await stringService.blpop(args))
         break
       case "TYPE":
-        connection.write(await redisService.getType(args))
+        connection.write(await stringService.getType(args))
         break
       case "XADD":
-        connection.write(redisService.xadd(args))
+        connection.write(streamService.xadd(args))
         break
       case "XRANGE":
-        connection.write(redisService.xrange(args))
+        connection.write(streamService.xrange(args))
         break
       case "XREAD":
-        connection.write(await redisService.xread(args))
+        connection.write(await streamService.xread(args))
         break
       default:
-        connection.write(redisService.unknownCommand(command))
+        connection.write(unknownCommand(command))
         break
     }
   })
