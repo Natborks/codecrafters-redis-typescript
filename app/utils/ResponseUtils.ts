@@ -23,8 +23,9 @@ export default class ResponseUtils {
     key: string = "", 
   ): string {
     let response = ""
+
     if (key) {
-      response = `*1\r\n*2\r\n$${this.writeBulkString([key])}\r\n*1\r\n`
+      response = `*1\r\n${this.writeArrayString([key, ""])}`
     }
     response.concat(`*${args.length}\r\n`)
 
