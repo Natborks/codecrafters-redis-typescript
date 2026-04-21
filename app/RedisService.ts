@@ -219,13 +219,14 @@ export default class RedisService {
       return result
     }
 
+
+    if (args[0] !== "BLOCK") {
+      return Promise.resolve(args)
+    }
+
     const [block, milliseconds, streams, ...rest] = args
     let delay = parseFloat(milliseconds)
     console.log("DELAY: ", delay)
-
-    if (!block) {
-      return Promise.resolve(rest)
-    }
 
     const data = getResponse(rest)
 
