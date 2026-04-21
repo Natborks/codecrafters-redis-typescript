@@ -1,5 +1,6 @@
 import Store from "./Store";
 import Parser from "./parser/Parser";
+import StreamId from "./types/StreamId";
 import IdUtils from "./utils/IdUtils";
 import ResponseUtils from "./utils/ResponseUtils";
 
@@ -139,11 +140,18 @@ export default class RedisService {
 
   xread(args: string[]): string {
     console.log("ARGS: ", args)
-    const [, key, startPoint] = args
+    const [, ...rest] = args
 
-    const result = this.store.xread(key, startPoint)
-    console.log("result: ", result)
-    return ResponseUtils.writeArrayString([[key, result]])
+    let start = 0
+    let end = rest.length - 1
+    const result = []
+
+    while (end > start) {
+      const res = this.store.xread(rest[start], rest[end])
+      result.push(res)
+    }
+    
+    return ResponseUtils.writeArrayString([[result]])
   }
 
   unknownCommand(command: string): string {
@@ -192,14 +200,3 @@ export default class RedisService {
     })
   }
 }
-
-// const redisService = new RedisService();
-// const [command, ...args] = redisService.parse("*3\r\n$5\r\nBLPOP\r\n$9\r\nraspberry\r\n$3\r\n0.1\r\n");
-// const result = await redisService.blpop(args)
-
-// const redisService = new RedisService();
-// const [, ...args] = redisService.parse("*3\r\n$5\r\nBLPOP\r\n$8\r\npineapple\r\n$3\r\n3\r\n");
-// const blpop = async () => await redisService.blpop(args)
-// const response = blpop()
-// const [, ...newargs] = redisService.parse("*3\r\n$5\r\nRPUSH\r\n$9\r\npineapple\r\n$4\r\npear\r\n")
-// let result = redisService.lpush(newargs)

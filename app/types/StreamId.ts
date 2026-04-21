@@ -42,4 +42,8 @@ export default class StreamId {
     toString() : string {
         return `${this.id}-${this.sequence}`
     }
+
+    static isValidStreamKey(id: string) : boolean{
+        return false
+    }
 }
