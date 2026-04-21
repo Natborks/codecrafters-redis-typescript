@@ -148,6 +148,7 @@ export default class RedisService {
     while (end > start) {
       console.log("REST", rest[start], rest[end])
       const res = this.store.xread(rest[start], rest[end])
+      console.log(res)
       result.push(res)
       start++
       end--
