@@ -16,7 +16,7 @@ export default class IdUtils {
         const topId = new StreamId(rawTopId)
         const newId = new StreamId(rawNewId)
 
-        return topId.compareTo(newId)
+        return newId.compareTo(topId)
         // let [newMillisecondsPart, newSequencePart] = newId.split("-")
         // let  [topMillisecondsPart, topSequencePart] = topId.split("-")
 
