@@ -144,6 +144,10 @@ export default class RedisService {
     const [block, milliseconds, streams, ...rest] = args
     let delay = parseFloat(milliseconds) * 1000
 
+    if (!block) {
+      return Promise.resolve(ResponseUtils.writeArrayString(this.handleXread(rest)))
+    }
+
     const data = this.handleXread(rest)
 
     if(data.length > 1) {
