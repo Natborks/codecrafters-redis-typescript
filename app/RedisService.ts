@@ -220,7 +220,7 @@ export default class RedisService {
     }
 
     console.log("ARGS: ", args)
-    if (args[0] !== "BLOCK") {
+    if (args[0] !== "block") {
       const [, ...rest] = args
       return Promise.resolve(getResponse(rest))
     }
