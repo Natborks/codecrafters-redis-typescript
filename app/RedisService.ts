@@ -141,35 +141,12 @@ export default class RedisService {
   }
 
   async xread(args: string[]): Promise<string> {
-    const [block, milliseconds, streams, ...rest] = args
-    let delay = parseFloat(milliseconds)
-
-    if (!block) {
-      return Promise.resolve(ResponseUtils.writeArrayString(this.handleXread(rest)))
+    try {
+      const result = await this.handleXread(args)
+      return ResponseUtils.writeArrayString(result)
+    }catch {
+      return "*-1\r\n";
     }
-
-    const data = this.handleXread(rest)
-
-    if(data && data.length > 1) {
-      return Promise.resolve(ResponseUtils.writeArrayString(data))
-    }
-
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject("*-1\r\n")
-      }, delay)
-
-      const command = () => {
-        const data = this.handleXread(rest)
-        clearTimeout(timeout)
-        return resolve(ResponseUtils.writeArrayString(data))
-      }
-
-      const streamKey = rest[0]
-      const stream = this.streamRequestQueue.get(streamKey) || []
-      stream.push(command)
-      this.streamRequestQueue.set(streamKey, stream)
-    })
 
 
     // let key = 0
@@ -224,7 +201,8 @@ export default class RedisService {
     })
   }
 
-  private handleXread(args: string[]) : any[]{
+  private handleXread(args: string[]) : Promise<any[]> {
+    const getResponse = (args: string[]) => {
       let key = 0
       let id = args.length / 2
       const result = []
@@ -239,6 +217,38 @@ export default class RedisService {
       }
 
       return result
+    }
+
+    const [block, milliseconds, streams, ...rest] = args
+    let delay = parseFloat(milliseconds)
+
+    if (!block) {
+      return Promise.resolve(rest)
+    }
+
+    const data = getResponse(rest)
+
+    if(data && data.length > 1) {
+      return Promise.resolve(data)
+    }
+
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject("*-1\r\n")
+      }, delay)
+
+      const command = () => {
+        const data = getResponse(rest)
+        clearTimeout(timeout)
+        return resolve(data)
+      }
+
+      const streamKey = rest[0]
+      const stream = this.streamRequestQueue.get(streamKey) || []
+      stream.push(command)
+      this.streamRequestQueue.set(streamKey, stream)
+    })
+ 
   }
   private handleDataAddedEvent() {
     this.store.on(this.ITEM_ADDED, ([type, itemKey]) => {
