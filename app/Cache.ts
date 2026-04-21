@@ -1,18 +1,17 @@
 import {EventEmitter} from 'node:events'
+import StreamId from './types/StreamId';
 
 export default class Cache extends EventEmitter{
-
+ 
   private cache: Map<string, any> = new Map();
   //TODO: convert this to a sorted datatructure for easy querying
-  private stream: Map<string, Array<{id: string, values: string[]}>> = new Map();
+  private stream: Map<string, Array<{id: StreamId, values: string[]}>> = new Map();
 
 
   private ITEM_ADDED = 'item added'
 
   constructor() {
     super();
-
-    // this.handleDataAddedEvent()
   }
 
   set(key: string, value: any, options: string[] = []) {
@@ -87,12 +86,8 @@ export default class Cache extends EventEmitter{
     if (!streamQueue) return null
 
     for (let i = streamQueue.length - 1; i >= 0; i -= 1) {
-      const {id} = streamQueue[i]
-      const [streamMillisecondsPart] = id.split("-")
-
-      if (streamMillisecondsPart === millisecondsPart) {
-        return id
-      }
+      if(streamQueue[i].id.getId() === parseInt(millisecondsPart)) 
+        return streamQueue[i].id.toString()
     }
 
     return null
@@ -135,36 +130,6 @@ export default class Cache extends EventEmitter{
     return result
   }
 
-  // blpop(key: string, timeout: number) : Promise<string[]> {
-  //   const value = this.lpop(key)
-  //   timeout = timeout * 1000 // for milliseconds for timeout
-  //   if (value && value.length > 0) {
-  //     return Promise.resolve([key, ...value])
-  //   }
-
-  //   return new Promise<string[]>((resolve, reject) => {
-  //     const commandTimeout = setTimeout(() => {
-  //       if (timeout === 0.0) {
-  //         //wait indefinitely if timeout is 0
-  //         setTimeout(() => {})
-  //       } else {
-  //         return reject([key])
-  //       }
-  //     }, timeout)
-
-  //     const command = () => {
-  //       const value = this.lpop(key) as []
-  //       clearTimeout(commandTimeout)
-  //       resolve([key, ...value])
-  //       return 
-  //     }
-
-  //     const commands = this.requestQueue.get(key) ?? []
-  //     commands.push(command)
-  //     this.requestQueue.set(key, commands)
-  //   })
-  // }
-
   llen(key: string) : number {
     const values = this.cache.get(key)
 
@@ -175,7 +140,7 @@ export default class Cache extends EventEmitter{
 
   xadd(key: string, entryId: string, entries: string[]): string {
     const streamQueue = this.stream.get(key) ?? []
-    streamQueue.push({id: entryId, values: entries})
+    streamQueue.push({id: new StreamId(entryId), values: entries})
     this.stream.set(key, streamQueue)
     return entryId;
   }
@@ -184,11 +149,11 @@ export default class Cache extends EventEmitter{
     const streamArray = this.stream.get(key)
     if (!streamArray) return []
 
-    return streamArray.filter(({id: currentId}) => {
-      const isAfterStart =  this.compareStreamIds(startId, currentId)
-      const isBeforeEnd = this.compareStreamIds(currentId, endId)
-
-      return isAfterStart && isBeforeEnd
+    return streamArray.filter(({id: currentId}) => 
+      currentId.gte(new StreamId(startId)) && 
+      currentId.lte(new StreamId(endId))
+    ).map(({id, values}) => {
+      return {id: id.toString(), values}
     })
   }
 
@@ -214,21 +179,5 @@ export default class Cache extends EventEmitter{
      endIdx = endIdx >= 0 ? endIdx : Math.max(0, endIdx + values.length)
 
      return [startIdx, endIdx]
-  }
-
-  private compareStreamIds(leftId: string, rightId: string): boolean {
-    const [leftMillisecondsPart, leftSequencePart] = leftId.split("-")
-    const [rightMillisecondsPart, rightSequencePart] = rightId.split("-")
-
-    const leftMilliseconds = parseInt(leftMillisecondsPart)
-    const rightMilliseconds = parseInt(rightMillisecondsPart)
-
-    if (leftMilliseconds - rightMilliseconds > 0) return false
-
-    if (leftMilliseconds === rightMilliseconds)  {
-      return rightSequencePart >= leftSequencePart
-    }
-
-    return false 
   }
 }
