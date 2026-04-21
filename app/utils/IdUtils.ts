@@ -12,30 +12,27 @@ export default class IdUtils {
      * @param newId The ID being validated for the new record.
      * @returns 0 when newId is 0-0, -1 when newId is not greater than topId, otherwise 1.
      */
-    static validateId(rawTopId: string, rawNewId: string) : number{
-        const topId = new StreamId(rawTopId)
-        const newId = new StreamId(rawNewId)
+    static validateId(topId: string, newId: string) : number{
 
-        return newId.compareTo(topId)
-        // let [newMillisecondsPart, newSequencePart] = newId.split("-")
-        // let  [topMillisecondsPart, topSequencePart] = topId.split("-")
+        let [newMillisecondsPart, newSequencePart] = newId.split("-")
+        let  [topMillisecondsPart, topSequencePart] = topId.split("-")
 
-        // const newMilliseconds = parseInt(newMillisecondsPart)
-        // const newSequence = parseInt(newSequencePart)
-        // const topMilliseconds = parseInt(topMillisecondsPart)
-        // const topSequence = parseInt(topSequencePart)
+        const newMilliseconds = parseInt(newMillisecondsPart)
+        const newSequence = parseInt(newSequencePart)
+        const topMilliseconds = parseInt(topMillisecondsPart)
+        const topSequence = parseInt(topSequencePart)
 
-        // if (newMilliseconds === 0 && newSequence === 0) return 0
+        if (newMilliseconds === 0 && newSequence === 0) return 0
 
-        // if (newMilliseconds < topMilliseconds) return -1
+        if (newMilliseconds < topMilliseconds) return -1
 
-        // if (newMilliseconds === topMilliseconds) {
-        //     if (newSequence <= topSequence) {
-        //         return -1
-        //     }
-        // }
+        if (newMilliseconds === topMilliseconds) {
+            if (newSequence <= topSequence) {
+                return -1
+            }
+        }
 
-        // return 1
+        return 1
         
     }
 
