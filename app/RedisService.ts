@@ -219,9 +219,8 @@ export default class RedisService {
       return result
     }
 
-
+    console.log("ARGS: ", args)
     if (args[0] !== "BLOCK") {
-
       const [, ...rest] = args
       return Promise.resolve(getResponse(rest))
     }
