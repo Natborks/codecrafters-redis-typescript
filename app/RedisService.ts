@@ -142,7 +142,7 @@ export default class RedisService {
     const [, key, startPoint] = args
 
     const result = this.store.xread(key, startPoint)
-    // console.log("result: ", result)
+    console.log("result: ", result)
     return ResponseUtils.writeArrayString([key, result])
   }
 
