@@ -221,6 +221,7 @@ export default class RedisService {
 
     const [block, milliseconds, streams, ...rest] = args
     let delay = parseFloat(milliseconds)
+    console.log("DELAY: ", delay)
 
     if (!block) {
       return Promise.resolve(rest)
@@ -250,6 +251,8 @@ export default class RedisService {
     })
  
   }
+
+
   private handleDataAddedEvent() {
     this.store.on(this.ITEM_ADDED, ([type, itemKey]) => {
       if (this.requestQueue.has(itemKey)) {
