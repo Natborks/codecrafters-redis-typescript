@@ -146,11 +146,9 @@ export default class RedisService {
     const result = []
 
     while (id < rest.length) {
-      console.log("REST", rest[key], rest[id])
       const streamKey = rest[key]
       const startId = rest[id]
       const res = this.store.xread(streamKey, startId)
-      console.log("RES",res)
       result.push([streamKey, res])
       key++
       id++
