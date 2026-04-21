@@ -134,7 +134,7 @@ export default class RedisService {
 
     const result = this.store.xrange(key, startId, endId)
 
-    return ResponseUtils.writeStreamArray(result)
+    return ResponseUtils.writeArrayString(result)
   }
 
   xread(args: string[]): string {
