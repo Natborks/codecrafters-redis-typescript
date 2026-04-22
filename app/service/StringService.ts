@@ -41,6 +41,10 @@ export default class StringService {
     return result ? ResponseUtils.writeBulkString([result]) : "$-1\r\n";
   }
 
+  multi(): string {
+    return ResponseUtils.writeSimpleString("OK");
+  }
+
   incr(args: string[]): string {
     const [key] = args;
 
