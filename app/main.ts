@@ -48,6 +48,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         break
       case "EXEC":
         connection.write(stringService.exec())
+        break
       case "INCR":
         connection.write(stringService.incr(args))
         break
