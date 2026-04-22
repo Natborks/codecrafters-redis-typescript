@@ -5,6 +5,7 @@ export default class Store extends EventEmitter{
  
   private cache: Map<string, any> = new Map();
   //TODO: convert this to a sorted datatructure for easy querying
+  //TODO: consider generator for ordered iteration
   private stream: Map<string, Array<{id: StreamId, values: string[]}>> = new Map();
 
 

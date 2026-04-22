@@ -4,9 +4,12 @@ import ResponseUtils from "../utils/ResponseUtils";
 export default class StringService {
   private requestQueue : Map<string, Array<() => void>> = new Map()
   private ITEM_ADDED = 'item added'
+  private execQueue: Array<() => void>
+  private execMode = false
 
   constructor(private store: Store) {
     this.registerQueueDrain()
+    this.execQueue = []
   }
 
   ping(): string {
@@ -19,6 +22,11 @@ export default class StringService {
 
   set(args: string[]): string {
     const [key, val, ...options] = args;
+    if (this.execMode) {
+      const command = () => this.set(args)
+      this.execQueue.push(command)
+      return ResponseUtils.writeSimpleString("QUEUED")
+    }
     this.store.set(key, val, options);
     return ResponseUtils.writeSimpleString("OK");
   }
@@ -42,11 +50,18 @@ export default class StringService {
   }
 
   multi(): string {
+    this.execMode = true
     return ResponseUtils.writeSimpleString("OK");
   }
 
   incr(args: string[]): string {
     const [key] = args;
+
+     if (this.execMode) {
+      const command = () => this.set(args)
+      this.execQueue.push(command)
+      return ResponseUtils.writeSimpleString("QUEUED")
+    }
 
     try {
       const value = this.store.incr(key)
@@ -54,6 +69,21 @@ export default class StringService {
     } catch (error) {
       return ResponseUtils.writeSimpleError("ERR value is not an integer or out of range")
     }
+  }
+   
+  exec(): string {
+    if (!this.execMode) {
+      return ResponseUtils.writeSimpleError("ERR EXEC without MULTI")
+    }
+
+    const responses = []
+    for (const command of this.execQueue) {
+      responses.push(command())
+    }
+
+    const response = ResponseUtils.writeArrayString(responses)
+    this.execMode = false
+    return response
   }
 
   lrange(args: string[]): string {

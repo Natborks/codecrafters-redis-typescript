@@ -46,6 +46,8 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "MULTI":
         connection.write(stringService.multi())
         break
+      case "EXEC":
+        connection.write(stringService.exec())
       case "INCR":
         connection.write(stringService.incr(args))
         break
