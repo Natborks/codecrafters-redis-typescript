@@ -70,16 +70,16 @@ export default class Store extends EventEmitter{
   incr(key: string): number {
     const value = this.cache.get(key)
 
-    if (Number.isNaN(value)) {
-      throw new Error("ERR value is not an integer or out of range")
-    }
-
     if (value === undefined) {
       this.cache.set(key, "1")
       return 1
     }
 
     const incrementedValue = Number(value) + 1
+
+    if (Number.isNaN(incrementedValue)) {
+      throw new Error("ERR value is not an integer or out of range")
+    }
 
     this.cache.set(key, incrementedValue.toString())
     return incrementedValue
