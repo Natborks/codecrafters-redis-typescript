@@ -4,12 +4,31 @@ import ResponseUtils from "../utils/ResponseUtils";
 export default class StringService {
   private requestQueue : Map<string, Array<() => void>> = new Map()
   private ITEM_ADDED = 'item added'
-  private execQueue: Array<() => void>
+  private execQueue: Array<() => string>
   private execMode = false
 
   constructor(private store: Store) {
     this.registerQueueDrain()
     this.execQueue = []
+
+    return new Proxy(this, {
+      get(target, prop, receiver) {
+        const method = Reflect.get(target, prop, receiver)
+
+        if (typeof method !== "function" || prop !== "exec") {
+          return method
+        }
+
+        return (...args: unknown[]) => {
+          if (!target.execMode) {
+            return method.apply(target, args)
+          }
+
+          target.execQueue.push(() => method.apply(target, args))
+          return ResponseUtils.writeSimpleString("QUEUED")
+        }
+      },
+    })
   }
 
   ping(): string {
@@ -22,11 +41,6 @@ export default class StringService {
 
   set(args: string[]): string {
     const [key, val, ...options] = args;
-    if (this.execMode) {
-      const command = () => this.set(args)
-      this.execQueue.push(command)
-      return ResponseUtils.writeSimpleString("QUEUED")
-    }
     this.store.set(key, val, options);
     return ResponseUtils.writeSimpleString("OK");
   }
@@ -57,12 +71,6 @@ export default class StringService {
   incr(args: string[]): string {
     const [key] = args;
 
-     if (this.execMode) {
-      const command = () => this.set(args)
-      this.execQueue.push(command)
-      return ResponseUtils.writeSimpleString("QUEUED")
-    }
-
     try {
       const value = this.store.incr(key)
       return ResponseUtils.writeInteger(value)
@@ -76,12 +84,13 @@ export default class StringService {
       return ResponseUtils.writeSimpleError("ERR EXEC without MULTI")
     }
 
-    const responses = []
+    const responses: string[] = []
     for (const command of this.execQueue) {
       responses.push(command())
     }
 
-    const response = ResponseUtils.writeArrayString(responses)
+    const response = `*${responses.length}\r\n${responses.join("")}`
+    this.execQueue = []
     this.execMode = false
     return response
   }
@@ -171,4 +180,5 @@ export default class StringService {
       nextCommand()
     })
   }
+
 }
