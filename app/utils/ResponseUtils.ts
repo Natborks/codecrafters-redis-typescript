@@ -3,7 +3,7 @@ export default class ResponseUtils {
     return `+${value}\r\n`
   }
 
-  static writenullArray(): string {
+  static writeNullArray(): string {
     return "$-1\r\n"
   }
 

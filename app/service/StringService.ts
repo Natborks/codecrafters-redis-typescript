@@ -73,7 +73,7 @@ export default class StringService {
   get(args: string[]): string {
     const [query] = args;
     const result = this.store.get(query);
-    return result ? ResponseUtils.writeBulkString([result]) : ResponseUtils.writenullArray();
+    return result ? ResponseUtils.writeBulkString([result]) : ResponseUtils.writeNullArray();
   }
 
   multi(): string {
@@ -104,7 +104,7 @@ export default class StringService {
         this.execMode = false
         this.execQueue = []
         watchQueue.drain()
-        return ResponseUtils.writeSimpleString("*-1\r\n")
+        return ResponseUtils.writeNullArray()
       }
       responses.push(command())
     }
@@ -140,7 +140,7 @@ export default class StringService {
     const elems = this.store.lpop(key, count);
 
     if (elems === null) {
-      return ResponseUtils.writenullArray();
+      return ResponseUtils.writeNullArray();
     }
 
     return elems.length === 1
