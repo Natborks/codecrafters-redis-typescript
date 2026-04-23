@@ -100,6 +100,7 @@ export default class StringService {
     //check 
     const responses: string[] = []
     for (const {key, command} of this.execQueue) {
+      console.log("KEY!", key)
       if (watchQueue.has(key)) {
         this.execMode = false
         this.execQueue = []
