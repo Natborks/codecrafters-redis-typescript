@@ -3,6 +3,7 @@ import ResponseUtils from "../utils/ResponseUtils";
 
 export default class StringService {
   static requestQueue : Map<string, Array<() => void>> = new Map()
+  static isQueueDrainRegsitered = false
   private ITEM_ADDED = 'item added'
   private execQueue: Array<() => string>
   private execMode = false
@@ -170,6 +171,8 @@ export default class StringService {
   }
 
   private registerQueueDrain() {
+    if (StringService.isQueueDrainRegsitered) return
+
     this.store.on(this.ITEM_ADDED, ([type, itemKey]) => {
       if (!StringService.requestQueue.has(itemKey)) return
 
@@ -182,6 +185,7 @@ export default class StringService {
 
       return nextCommand()
     })
+    StringService.isQueueDrainRegsitered = true
   }
 
 }
