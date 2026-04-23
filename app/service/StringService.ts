@@ -145,6 +145,10 @@ export default class StringService {
     return ResponseUtils.writeSimpleString(this.store.getType(key))
   }
 
+  watch(args: string[]) {
+    return ResponseUtils.writeSimpleString("OK")
+  }
+
   private getBlockingPopResult(args: string[]): Promise<string[]> {
     const [key, rawTimeout] = args;
     const value = this.store.lpop(key)
@@ -186,8 +190,6 @@ export default class StringService {
 
       const commands = StringService.requestQueue.get(itemKey)
       const nextCommand = commands?.shift()
-
-      console.log('returning next command: ', commands, nextCommand)
 
       if (!nextCommand) return
 
