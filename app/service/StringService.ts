@@ -97,6 +97,7 @@ export default class StringService {
     const responses: string[] = []
     for (const {key, command} of this.execQueue) {
       if (watchQueue.has(key)) {
+        console.log(key)
         this.execMode = false
         this.execQueue = []
         return ResponseUtils.writeSimpleString("*-1\r\n")
