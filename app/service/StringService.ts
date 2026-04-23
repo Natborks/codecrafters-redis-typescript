@@ -176,6 +176,8 @@ export default class StringService {
       const commands = this.requestQueue.get(itemKey)
       const nextCommand = commands?.shift()
 
+      console.log('returning next command: ', commands, nextCommand)
+
       if (!nextCommand) return
 
       return nextCommand()
