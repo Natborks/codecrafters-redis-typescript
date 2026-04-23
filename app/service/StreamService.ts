@@ -1,4 +1,4 @@
-import Store from "../Store";
+import Store from "../db/Store";
 import IdUtils from "../utils/IdUtils";
 import ResponseUtils from "../utils/ResponseUtils";
 

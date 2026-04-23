@@ -1,5 +1,5 @@
 import {EventEmitter} from 'node:events'
-import StreamId from './types/StreamId';
+import StreamId from '../types/StreamId';
 
 export default class Store extends EventEmitter{
  

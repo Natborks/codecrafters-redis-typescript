@@ -1,6 +1,6 @@
 import * as net from "net";
 import Parser from "./parser/Parser";
-import Store from "./Store";
+import Store from "./db/Store";
 import StreamService from "./service/StreamService";
 import StringService from "./service/StringService";
 

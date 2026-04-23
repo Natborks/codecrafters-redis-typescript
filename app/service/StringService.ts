@@ -1,4 +1,5 @@
-import Store from "../Store";
+import Store from "../db/Store";
+import { watchQueue } from "../db/WatchQueue";
 import ResponseUtils from "../utils/ResponseUtils";
 
 export default class StringService {
@@ -6,7 +7,7 @@ export default class StringService {
   static requestQueue : Map<string, Array<() => void>> = new Map()
   static isQueueDrainRegsitered = false
   private ITEM_ADDED = 'item added'
-  private execQueue: Array<() => string>
+  private execQueue: Array<{key: string, command: () => string}>
   private execMode = false
 
   constructor(private store: Store) {
@@ -27,11 +28,12 @@ export default class StringService {
         }
 
         return (...args: unknown[]) => {
+          const key = args[0] as string
           if (!target.execMode) {
             return method.apply(target, args)
           }
 
-          target.execQueue.push(() => method.apply(target, args))
+          target.execQueue.push({key, command: () => method.apply(target, args)})
           return ResponseUtils.writeSimpleString("QUEUED")
         }
       },
@@ -91,8 +93,14 @@ export default class StringService {
       return ResponseUtils.writeSimpleError("ERR EXEC without MULTI")
     }
 
+    //check 
     const responses: string[] = []
-    for (const command of this.execQueue) {
+    for (const {key, command} of this.execQueue) {
+      if (watchQueue.has(key)) {
+        this.execMode = false
+        this.execQueue = []
+        return ResponseUtils.writeSimpleString("*-1\r\n")
+      }
       responses.push(command())
     }
 
@@ -152,6 +160,9 @@ export default class StringService {
 
   watch(args: string[]) {
     if (this.execMode) return ResponseUtils.writeSimpleError("ERR WATCH inside MULTI is not allowed")
+    
+    const [key] = args
+    watchQueue.push(key)
     return ResponseUtils.writeSimpleString("OK")
   }
 
