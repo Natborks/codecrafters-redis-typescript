@@ -98,6 +98,7 @@ export default class StringService {
   }
 
   discard(): string {
+    if (!this.execMode) return ResponseUtils.writeSimpleError("ERR DISCARD without MULTI")
     this.execQueue = []
     this.execMode = false
     return ResponseUtils.writeSimpleString("OK")
