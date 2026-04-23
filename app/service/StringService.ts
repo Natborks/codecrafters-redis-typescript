@@ -178,7 +178,7 @@ export default class StringService {
 
       if (!nextCommand) return
 
-      nextCommand()
+      return nextCommand()
     })
   }
 
