@@ -112,6 +112,7 @@ export default class StringService {
     const response = `*${responses.length}\r\n${responses.join("")}`
     this.execQueue = []
     this.execMode = false
+    watchQueue.drain()
     return response
   }
 

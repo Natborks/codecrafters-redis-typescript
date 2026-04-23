@@ -4,7 +4,7 @@ export default class ResponseUtils {
   }
 
   static writeNullArray(): string {
-    return "$-1\r\n"
+    return "*-1\r\n"
   }
 
   static writeBulkString(args: string[]): string {
