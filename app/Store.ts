@@ -147,6 +147,8 @@ export default class Store extends EventEmitter{
       result.push(elem)
     }
 
+    console.log("RESULT: ", result)
+
     return result
   }
 
