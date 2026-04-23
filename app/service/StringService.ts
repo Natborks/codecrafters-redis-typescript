@@ -29,6 +29,8 @@ export default class StringService {
 
         return (...args: unknown[]) => {
           const key = args[0] as string
+          watchQueue.push(key)
+          
           if (!target.execMode) {
             return method.apply(target, args)
           }
@@ -97,7 +99,6 @@ export default class StringService {
     const responses: string[] = []
     for (const {key, command} of this.execQueue) {
       if (watchQueue.has(key)) {
-        console.log(key)
         this.execMode = false
         this.execQueue = []
         return ResponseUtils.writeSimpleString("*-1\r\n")
@@ -162,8 +163,6 @@ export default class StringService {
   watch(args: string[]) {
     if (this.execMode) return ResponseUtils.writeSimpleError("ERR WATCH inside MULTI is not allowed")
     
-    const [key] = args
-    watchQueue.push(key)
     return ResponseUtils.writeSimpleString("OK")
   }
 
