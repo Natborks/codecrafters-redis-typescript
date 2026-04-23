@@ -17,7 +17,12 @@ export default class StringService {
       get(target, prop, receiver) {
         const method = Reflect.get(target, prop, receiver)
 
-        if (typeof method !== "function" || prop === "exec" || prop === 'multi' || prop === "discard") {
+        if (typeof method !== "function" 
+          || prop === "exec" 
+          || prop === "multi" 
+          || prop === "discard"
+          || prop === "watch"
+        ) {
           return method
         }
 
