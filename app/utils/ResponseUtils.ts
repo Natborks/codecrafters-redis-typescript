@@ -3,6 +3,10 @@ export default class ResponseUtils {
     return `+${value}\r\n`
   }
 
+  static writenullArray(): string {
+    return "$-1\r\n"
+  }
+
   static writeBulkString(args: string[]): string {
     let response = "";
     for (const literal of args) {

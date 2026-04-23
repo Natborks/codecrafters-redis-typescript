@@ -29,8 +29,10 @@ export default class StringService {
 
         return (...args: unknown[]) => {
           const key = args[0] as string
-          watchQueue.push(key)
-          
+          if (watchQueue.isWatching()) {
+            watchQueue.push(key)
+          }
+
           if (!target.execMode) {
             return method.apply(target, args)
           }
@@ -71,7 +73,7 @@ export default class StringService {
   get(args: string[]): string {
     const [query] = args;
     const result = this.store.get(query);
-    return result ? ResponseUtils.writeBulkString([result]) : "$-1\r\n";
+    return result ? ResponseUtils.writeBulkString([result]) : ResponseUtils.writenullArray();
   }
 
   multi(): string {
@@ -101,6 +103,7 @@ export default class StringService {
       if (watchQueue.has(key)) {
         this.execMode = false
         this.execQueue = []
+        watchQueue.drain()
         return ResponseUtils.writeSimpleString("*-1\r\n")
       }
       responses.push(command())
@@ -137,7 +140,7 @@ export default class StringService {
     const elems = this.store.lpop(key, count);
 
     if (elems === null) {
-      return "$-1\r\n";
+      return ResponseUtils.writenullArray();
     }
 
     return elems.length === 1
@@ -162,7 +165,8 @@ export default class StringService {
 
   watch(args: string[]) {
     if (this.execMode) return ResponseUtils.writeSimpleError("ERR WATCH inside MULTI is not allowed")
-    
+   
+    watchQueue.startWatching()
     return ResponseUtils.writeSimpleString("OK")
   }
 
