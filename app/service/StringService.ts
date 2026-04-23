@@ -151,7 +151,7 @@ export default class StringService {
   }
 
   watch(args: string[]) {
-    if (this.execMode) return ResponseUtils.writeSimpleError("ERR WATCH inside MULTI is not allowe")
+    if (this.execMode) return ResponseUtils.writeSimpleError("ERR WATCH inside MULTI is not allowed")
     return ResponseUtils.writeSimpleString("OK")
   }
 
