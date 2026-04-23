@@ -19,9 +19,9 @@ export default class StringService {
           return method
         }
 
-        return (...args: unknown[]) => {
+        return async (...args: unknown[]) => {
           if (!target.execMode) {
-            return method.apply(target, args)
+            return await method.apply(target, args)
           }
 
           target.execQueue.push(() => method.apply(target, args))
