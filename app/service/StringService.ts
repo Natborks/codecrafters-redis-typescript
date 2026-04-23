@@ -2,6 +2,7 @@ import Store from "../Store";
 import ResponseUtils from "../utils/ResponseUtils";
 
 export default class StringService {
+  //All instances have to have the same queue
   static requestQueue : Map<string, Array<() => void>> = new Map()
   static isQueueDrainRegsitered = false
   private ITEM_ADDED = 'item added'
@@ -16,7 +17,7 @@ export default class StringService {
       get(target, prop, receiver) {
         const method = Reflect.get(target, prop, receiver)
 
-        if (typeof method !== "function" || prop === "exec" || prop === 'multi') {
+        if (typeof method !== "function" || prop === "exec" || prop === 'multi' || prop === "discard") {
           return method
         }
 
@@ -94,6 +95,12 @@ export default class StringService {
     this.execQueue = []
     this.execMode = false
     return response
+  }
+
+  discard(): string {
+    this.execQueue = []
+    this.execMode = false
+    return ResponseUtils.writeSimpleString("OK")
   }
 
   lrange(args: string[]): string {
