@@ -6,7 +6,6 @@ import StringService from "./service/StringService";
 
 const store = new Store();
 const streamService = new StreamService(store);
-const stringService = new StringService(store);
 
 const parse = (data: string): string[] => {
   const parser = new Parser(data);
@@ -19,6 +18,7 @@ const unknownCommand = (command: string): string => {
 
 // Uncomment the code below to pass the first stage
 const server: net.Server = net.createServer((connection: net.Socket) => {
+  const stringService = new StringService(store);
 
   // Handle connection
   connection.on('data', async (data: Buffer) => {

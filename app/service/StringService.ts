@@ -2,7 +2,7 @@ import Store from "../Store";
 import ResponseUtils from "../utils/ResponseUtils";
 
 export default class StringService {
-  private requestQueue : Map<string, Array<() => void>> = new Map()
+  static requestQueue : Map<string, Array<() => void>> = new Map()
   private ITEM_ADDED = 'item added'
   private execQueue: Array<() => string>
   private execMode = false
@@ -163,17 +163,17 @@ export default class StringService {
         return
       }
 
-      const commands = this.requestQueue.get(key) ?? []
+      const commands = StringService.requestQueue.get(key) ?? []
       commands.push(command)
-      this.requestQueue.set(key, commands)
+      StringService.requestQueue.set(key, commands)
     })
   }
 
   private registerQueueDrain() {
     this.store.on(this.ITEM_ADDED, ([type, itemKey]) => {
-      if (!this.requestQueue.has(itemKey)) return
+      if (!StringService.requestQueue.has(itemKey)) return
 
-      const commands = this.requestQueue.get(itemKey)
+      const commands = StringService.requestQueue.get(itemKey)
       const nextCommand = commands?.shift()
 
       console.log('returning next command: ', commands, nextCommand)
