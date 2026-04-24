@@ -1,5 +1,5 @@
 import Store from "../db/Store";
-import WatchQueue from "../db/WatchQueue";
+import { watchQueue } from "../db/WatchQueue";
 import type { Event } from "../types/Service";
 import ResponseUtils from "../utils/ResponseUtils";
 
@@ -10,12 +10,10 @@ export default class StringService {
   private ITEM_ADDED = 'item added'
   private execQueue: Array<{key: string, command: () => string}>
   private execMode = false
-  private watchQueue
 
   constructor(private store: Store) {
     this.registerQueueDrain()
     this.execQueue = []
-    this.watchQueue = new WatchQueue()
 
     return new Proxy(this, {
       get(target, prop, receiver) {
@@ -100,11 +98,11 @@ export default class StringService {
     //check 
     const responses: string[] = []
     for (const {key, command} of this.execQueue) {
-      const events = this.watchQueue.get(key)
+      const events = watchQueue.get(key)
       if (events && events.length > 1) {
         this.execMode = false
         this.execQueue = []
-        this.watchQueue.drain()
+        watchQueue.drain()
         return ResponseUtils.writeNullArray()
       }
       responses.push(command())
@@ -113,7 +111,7 @@ export default class StringService {
     const response = `*${responses.length}\r\n${responses.join("")}`
     this.execQueue = []
     this.execMode = false
-    this.watchQueue.drain()
+    watchQueue.drain()
     return response
   }
 
@@ -168,7 +166,7 @@ export default class StringService {
   watch(args: string[]) {
     if (this.execMode) return ResponseUtils.writeSimpleError("ERR WATCH inside MULTI is not allowed")
    
-    this.watchQueue.startWatching(args[0])
+    watchQueue.startWatching(args[0])
     return ResponseUtils.writeSimpleString("OK")
   }
 
@@ -211,7 +209,7 @@ export default class StringService {
     this.store.on(this.ITEM_ADDED, (event: Event) => {
       if (!StringService.requestQueue.has(event.key)) return
 
-      if (this.watchQueue.has(event.key)) this.watchQueue.set(event)
+      if (watchQueue.has(event.key)) watchQueue.set(event)
 
       const commands = StringService.requestQueue.get(event.key)
       const nextCommand = commands?.shift()
