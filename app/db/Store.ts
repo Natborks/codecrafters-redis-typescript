@@ -210,10 +210,10 @@ export default class Store extends EventEmitter{
 
   private emitItemsAdded(event: Event, itemCount: number) {
     if (itemCount === 0) return
-
-    setImmediate(() => {
-      this.emit(this.ITEM_ADDED, event)
-    })
+   this.emit(this.ITEM_ADDED, event)
+    // setImmediate(() => {
+    //   this.emit(this.ITEM_ADDED, event)
+    // })
   }
 
   private normalizeIndices(startIdx: number, endIdx: number, values: any[]) : number[] {

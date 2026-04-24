@@ -13,6 +13,7 @@ export default class StringService {
 
   constructor(private store: Store) {
     this.registerQueueDrain()
+    this.registerWatchEventHandler()
     this.execQueue = []
 
     return new Proxy(this, {
@@ -221,4 +222,16 @@ export default class StringService {
     StringService.isQueueDrainRegsitered = true
   }
 
+    private registerWatchEventHandler() {
+
+    this.store.on(this.ITEM_ADDED, (event: Event) => {
+      if (watchQueue.has(event.key)) watchQueue.set(event)
+
+    })
+  }
+  
+
+  
 }
+
+

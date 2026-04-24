@@ -6,7 +6,7 @@ class WatchQueue {
     set(event: Event) {
         const {key} = event
         this.watchQueue.get(key)?.push(event)
-        console.log("SETTING QUEUE:", watchQueue)
+        console.log("SETTING QUEUE:", Object.entries(watchQueue))
     }
 
     get(key: string) {
