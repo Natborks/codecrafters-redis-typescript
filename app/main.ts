@@ -75,7 +75,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         connection.write(stringService.watch(args))
         break
       case "UNWATCH":
-        connection.write(stringService.unwatch())
+        connection.write(stringService.unwatch(args))
         break
       case "XADD":
         connection.write(streamService.xadd(args))
