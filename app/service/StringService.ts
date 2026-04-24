@@ -179,7 +179,7 @@ export default class StringService {
     return ResponseUtils.writeSimpleString("OK")
   }
 
-  unwatch(keys: []) {
+  unwatch(keys: string[]) {
 
     for (const key in keys) {
       this.watchQueue.stopWatching(key)
