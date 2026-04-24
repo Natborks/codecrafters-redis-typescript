@@ -1,16 +1,17 @@
 import type { Event } from "../types/Service"
 
-class WatchQueue {
-    private watchQueue : Map<string, Event[]> = new Map()
+export default class WatchQueue {
+    private watchQueue: Map<string, Event[]> = new Map()
 
     set(event: Event) {
-        const {key} = event
-        this.watchQueue.get(key)?.push(event)
-        console.log("SETTING QUEUE:", Object.entries(watchQueue))
+        const events = this.watchQueue.get(event.key)
+        if (!events) return
+
+        events.push(event)
     }
 
-    get(key: string) {
-        return this.watchQueue.get(key)
+    get(key: string): Event[] {
+        return this.watchQueue.get(key) ?? []
     }
 
     has(key: string) {
@@ -18,24 +19,24 @@ class WatchQueue {
     }
 
     items() {
-        return Object.entries(this.watchQueue)
+        return this.watchQueue.entries()
     }
 
     drain() {
-        this.watchQueue = new Map()
+        this.watchQueue.clear()
     }
 
-    isWatching() : boolean {
-        return Object.keys(this.watchQueue).length > 0
+    isWatching(): boolean {
+        return this.watchQueue.size > 0
     }
     
     startWatching(key: string) {
-        this.watchQueue.set(key, [])
+        if (!this.has(key)) {
+            this.watchQueue.set(key, [])
+        }
     }
 
     stopWatching(key: string) {
         this.watchQueue.delete(key)
     }
 }
-
-export const watchQueue = new WatchQueue()

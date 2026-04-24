@@ -1,5 +1,5 @@
 import Store from "../db/Store";
-import { watchQueue } from "../db/WatchQueue";
+import WatchQueue from "../db/WatchQueue";
 import type { Event } from "../types/Service";
 import ResponseUtils from "../utils/ResponseUtils";
 
@@ -10,6 +10,7 @@ export default class StringService {
   private ITEM_ADDED = 'item added'
   private execQueue: Array<{key: string, command: () => string}>
   private execMode = false
+  private watchQueue = new WatchQueue()
 
   constructor(private store: Store) {
     this.registerQueueDrain()
@@ -72,7 +73,7 @@ export default class StringService {
   get(args: string[]): string {
     const [query] = args;
     const result = this.store.get(query);
-    return result ? ResponseUtils.writeBulkString([result]) : ResponseUtils.writeNullArray();
+    return result ? ResponseUtils.writeBulkString([result]) : ResponseUtils.writeNullBulkString();
   }
 
   multi(): string {
@@ -96,23 +97,24 @@ export default class StringService {
       return ResponseUtils.writeSimpleError("ERR EXEC without MULTI")
     }
 
-    //check 
+    if (this.hasModifiedWatchedKeys()) {
+      this.execMode = false
+      this.execQueue = []
+      this.watchQueue.drain()
+      return ResponseUtils.writeNullArray()
+    }
+
+    const queuedCommands = this.execQueue
     const responses: string[] = []
-    for (const {key, command} of this.execQueue) {
-      const events = watchQueue.get(key)
-      if (events && events.length > 1) {
-        this.execMode = false
-        this.execQueue = []
-        watchQueue.drain()
-        return ResponseUtils.writeNullArray()
-      }
+    this.execQueue = []
+    this.execMode = false
+    this.watchQueue.drain()
+
+    for (const {command} of queuedCommands) {
       responses.push(command())
     }
 
     const response = `*${responses.length}\r\n${responses.join("")}`
-    this.execQueue = []
-    this.execMode = false
-    watchQueue.drain()
     return response
   }
 
@@ -120,6 +122,7 @@ export default class StringService {
     if (!this.execMode) return ResponseUtils.writeSimpleError("ERR DISCARD without MULTI")
     this.execQueue = []
     this.execMode = false
+    this.watchQueue.drain()
     return ResponseUtils.writeSimpleString("OK")
   }
 
@@ -141,7 +144,7 @@ export default class StringService {
     const elems = this.store.lpop(key, count);
 
     if (elems === null) {
-      return ResponseUtils.writeNullArray();
+      return ResponseUtils.writeNullBulkString();
     }
 
     return elems.length === 1
@@ -166,8 +169,11 @@ export default class StringService {
 
   watch(args: string[]) {
     if (this.execMode) return ResponseUtils.writeSimpleError("ERR WATCH inside MULTI is not allowed")
-   
-    watchQueue.startWatching(args[0])
+
+    for (const key of args) {
+      this.watchQueue.startWatching(key)
+    }
+
     return ResponseUtils.writeSimpleString("OK")
   }
 
@@ -208,8 +214,6 @@ export default class StringService {
     if (StringService.isQueueDrainRegsitered) return
 
     this.store.on(this.ITEM_ADDED, (event: Event) => {
-      if (watchQueue.has(event.key)) watchQueue.set(event)
-
       if (!StringService.requestQueue.has(event.key)) return
 
       const commands = StringService.requestQueue.get(event.key)
@@ -222,16 +226,17 @@ export default class StringService {
     StringService.isQueueDrainRegsitered = true
   }
 
-    private registerWatchEventHandler() {
-
+  private registerWatchEventHandler() {
     this.store.on(this.ITEM_ADDED, (event: Event) => {
-      if (watchQueue.has(event.key)) watchQueue.set(event)
-
+      if (this.watchQueue.has(event.key)) this.watchQueue.set(event)
     })
   }
-  
 
-  
+  private hasModifiedWatchedKeys(): boolean {
+    for (const [, events] of this.watchQueue.items()) {
+      if (events.length > 0) return true
+    }
+
+    return false
+  }
 }
-
-

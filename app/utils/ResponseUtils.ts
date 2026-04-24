@@ -3,6 +3,10 @@ export default class ResponseUtils {
     return `+${value}\r\n`
   }
 
+  static writeNullBulkString(): string {
+    return "$-1\r\n"
+  }
+
   static writeNullArray(): string {
     return "*-1\r\n"
   }
