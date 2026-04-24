@@ -1,6 +1,6 @@
 import type { Event } from "../types/Service"
 
-class WatchQueue {
+export default class WatchQueue {
     private watchQueue : Map<string, Event[]> = new Map()
 
     set(event: Event) {
@@ -37,4 +37,4 @@ class WatchQueue {
     }
 }
 
-export const watchQueue = new WatchQueue()
+// export const watchQueue = new WatchQueue()
