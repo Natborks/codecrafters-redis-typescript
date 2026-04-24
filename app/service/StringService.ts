@@ -1,5 +1,6 @@
 import Store from "../db/Store";
 import { watchQueue } from "../db/WatchQueue";
+import type { Event } from "../types/Service";
 import ResponseUtils from "../utils/ResponseUtils";
 
 export default class StringService {
@@ -29,9 +30,6 @@ export default class StringService {
 
         return (...args: unknown[]) => {
           const key = args[0] as string
-          if (watchQueue.isWatching()) {
-            watchQueue.push(key)
-          }
 
           if (!target.execMode) {
             return method.apply(target, args)
@@ -168,7 +166,7 @@ export default class StringService {
   watch(args: string[]) {
     if (this.execMode) return ResponseUtils.writeSimpleError("ERR WATCH inside MULTI is not allowed")
    
-    watchQueue.startWatching()
+    watchQueue.startWatching(args[0])
     return ResponseUtils.writeSimpleString("OK")
   }
 
@@ -208,10 +206,12 @@ export default class StringService {
   private registerQueueDrain() {
     if (StringService.isQueueDrainRegsitered) return
 
-    this.store.on(this.ITEM_ADDED, ([type, itemKey]) => {
-      if (!StringService.requestQueue.has(itemKey)) return
+    this.store.on(this.ITEM_ADDED, (event: Event) => {
+      if (!StringService.requestQueue.has(event.key)) return
 
-      const commands = StringService.requestQueue.get(itemKey)
+      if (watchQueue.has(event.key)) watchQueue.push(event)
+
+      const commands = StringService.requestQueue.get(event.key)
       const nextCommand = commands?.shift()
 
       if (!nextCommand) return

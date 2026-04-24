@@ -1,5 +1,6 @@
 import {EventEmitter} from 'node:events'
 import StreamId from '../types/StreamId';
+import type { Event } from '../types/Service';
 
 export default class Store extends EventEmitter{
  
@@ -22,6 +23,7 @@ export default class Store extends EventEmitter{
       this.handleSetCacheOptions(key, options);
     }
 
+    this.emitItemsAdded({key, method: 'set', args: value}, 1)
   }
 
   rpush(key: string, values: any[]): number {
@@ -32,14 +34,15 @@ export default class Store extends EventEmitter{
       vals.push(val)
     }
 
+    let length = vals.length
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.push(...vals);
-      this.emitItemsAdded(key, vals.length)
-      return existingValue.length
-    } 
+      length = existingValue.length
+    } else {
+      this.cache.set(key, vals);
+    }
     
-    this.cache.set(key, vals);
-    this.emitItemsAdded(key, vals.length)
+    this.emitItemsAdded({key, method: 'rpush', args: values}, vals.length)
  
     return vals.length;
   }
@@ -54,12 +57,12 @@ export default class Store extends EventEmitter{
 
     if (existingValue && Array.isArray(existingValue)) {
       existingValue.unshift(...vals)
-      this.emitItemsAdded(key, vals.length)
+      this.emitItemsAdded({key, method: 'lpush', args: values}, vals.length)
       return existingValue.length
     }
 
     this.cache.set(key, vals)
-    this.emitItemsAdded(key, vals.length)
+    this.emitItemsAdded({key, method: 'lpush', args: values}, vals.length)
 
     return vals.length
   }
@@ -205,11 +208,11 @@ export default class Store extends EventEmitter{
     }, interval);
   }
 
-  private emitItemsAdded(key: string, itemCount: number) {
+  private emitItemsAdded(event: Event, itemCount: number) {
     if (itemCount === 0) return
 
     setImmediate(() => {
-      this.emit(this.ITEM_ADDED, ["key", key])
+      this.emit(this.ITEM_ADDED, event)
     })
   }
 

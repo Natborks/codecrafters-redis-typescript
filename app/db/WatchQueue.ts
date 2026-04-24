@@ -1,9 +1,11 @@
-class WatchQueue {
-    private watchQueue : Set<string> = new Set()
-    private watchMode = false 
+import type { Event } from "../types/Service"
 
-    push(item: string) {
-        if (!this.has(item)) this.watchQueue.add(item)
+class WatchQueue {
+    private watchQueue : Map<string, Event[]> = new Map()
+
+    push(event: Event) {
+        const {key} = event
+        this.watchQueue.get(key)?.push(event)
     }
 
     has(key: string) {
@@ -11,24 +13,23 @@ class WatchQueue {
     }
 
     items() {
-        return watchQueue
+        return Object.entries(this.watchQueue)
     }
 
     drain() {
-        this.watchQueue = new Set()
-        this.stopWatching()
+        this.watchQueue = new Map()
     }
 
     isWatching() : boolean {
-        return this.watchMode === true
+        return Object.keys(this.watchQueue).length > 0
     }
     
-    startWatching() {
-        this.watchMode = true
+    startWatching(key: string) {
+        this.watchQueue.set(key, [])
     }
 
-    stopWatching() {
-        this.watchMode = false
+    stopWatching(key: string) {
+        this.watchQueue.delete(key)
     }
 }
 
