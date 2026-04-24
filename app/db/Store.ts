@@ -40,11 +40,12 @@ export default class Store extends EventEmitter{
       length = existingValue.length
     } else {
       this.cache.set(key, vals);
+      length = vals.length
     }
     
     this.emitItemsAdded({key, method: 'rpush', args: values}, vals.length)
  
-    return vals.length;
+    return length;
   }
 
   lpush(key: string, values: any[]) : number {
@@ -90,9 +91,12 @@ export default class Store extends EventEmitter{
   }
 
   getType(key: string): string {
-    const response = this.cache.has(key) ?
-      "string" :
-      this.stream.has(key) ? "stream" : "none"
+    const cachedValue = this.cache.get(key)
+
+    const response = this.stream.has(key) ?
+      "stream" :
+      Array.isArray(cachedValue) ? "list" :
+      this.cache.has(key) ? "string" : "none"
 
     return response
   }
@@ -149,8 +153,6 @@ export default class Store extends EventEmitter{
       const elem = values.shift()
       result.push(elem)
     }
-
-    console.log("RESULT: ", result)
 
     return result
   }

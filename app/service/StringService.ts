@@ -198,7 +198,6 @@ export default class StringService {
 
       const command = () => {
         const value = this.store.lpop(key) as []
-        console.log("BLPOP RESULT", value)
         clearTimeout(commandTimeout)
         resolve([key, ...value])
         return
