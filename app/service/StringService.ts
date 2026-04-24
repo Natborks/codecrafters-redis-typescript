@@ -207,9 +207,9 @@ export default class StringService {
     if (StringService.isQueueDrainRegsitered) return
 
     this.store.on(this.ITEM_ADDED, (event: Event) => {
-      if (!StringService.requestQueue.has(event.key)) return
-
       if (watchQueue.has(event.key)) watchQueue.set(event)
+
+      if (!StringService.requestQueue.has(event.key)) return
 
       const commands = StringService.requestQueue.get(event.key)
       const nextCommand = commands?.shift()
