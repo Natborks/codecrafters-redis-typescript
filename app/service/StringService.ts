@@ -27,6 +27,7 @@ export default class StringService {
           || prop === "discard"
           || prop === "watch"
           || prop === "hasModifiedWatchedKeys"
+          || prop === "unwatch"
         ) {
           return method
           // return typeof method === "function" ? method.bind(target) : method
@@ -181,9 +182,7 @@ export default class StringService {
 
   unwatch(keys: string[]) {
 
-    for (const key in keys) {
-      this.watchQueue.stopWatching(key)
-    }
+    this.watchQueue.drain()
     return ResponseUtils.writeSimpleString("OK")
   }
 
