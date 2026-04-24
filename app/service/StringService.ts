@@ -27,7 +27,7 @@ export default class StringService {
           || prop === "discard"
           || prop === "watch"
         ) {
-          return method
+          return typeof method === "function" ? method.bind(target) : method
         }
 
         return (...args: unknown[]) => {
