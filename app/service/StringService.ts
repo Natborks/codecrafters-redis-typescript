@@ -98,8 +98,8 @@ export default class StringService {
     //check 
     const responses: string[] = []
     for (const {key, command} of this.execQueue) {
-      console.log("KEY!", key)
-      if (watchQueue.has(key)) {
+      const events = watchQueue.get(key)
+      if (events && events.length > 1) {
         this.execMode = false
         this.execQueue = []
         watchQueue.drain()
@@ -209,7 +209,7 @@ export default class StringService {
     this.store.on(this.ITEM_ADDED, (event: Event) => {
       if (!StringService.requestQueue.has(event.key)) return
 
-      if (watchQueue.has(event.key)) watchQueue.push(event)
+      if (watchQueue.has(event.key)) watchQueue.set(event)
 
       const commands = StringService.requestQueue.get(event.key)
       const nextCommand = commands?.shift()

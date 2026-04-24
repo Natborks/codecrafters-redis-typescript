@@ -3,9 +3,13 @@ import type { Event } from "../types/Service"
 class WatchQueue {
     private watchQueue : Map<string, Event[]> = new Map()
 
-    push(event: Event) {
+    set(event: Event) {
         const {key} = event
         this.watchQueue.get(key)?.push(event)
+    }
+
+    get(key: string) {
+        return this.watchQueue.get(key)
     }
 
     has(key: string) {
