@@ -179,6 +179,14 @@ export default class StringService {
     return ResponseUtils.writeSimpleString("OK")
   }
 
+  unwatch(keys: []) {
+
+    for (const key in keys) {
+      this.watchQueue.stopWatching(key)
+    }
+    return ResponseUtils.writeSimpleString("OK")
+  }
+
   private getBlockingPopResult(args: string[]): Promise<string[]> {
     const [key, rawTimeout] = args;
     const value = this.store.lpop(key)
