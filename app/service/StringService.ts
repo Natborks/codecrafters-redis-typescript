@@ -26,8 +26,10 @@ export default class StringService {
           || prop === "multi" 
           || prop === "discard"
           || prop === "watch"
+          || prop === "hasModifiedWatchedKeys"
         ) {
-          return typeof method === "function" ? method.bind(target) : method
+          return method
+          // return typeof method === "function" ? method.bind(target) : method
         }
 
         return (...args: unknown[]) => {
