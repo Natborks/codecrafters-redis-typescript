@@ -1,4 +1,5 @@
 import * as net from "net";
+import { argv } from "process";
 import Parser from "./parser/Parser";
 import Store from "./db/Store";
 import StreamService from "./service/StreamService";
@@ -15,9 +16,9 @@ const parse = (data: string): string[] => {
 const unknownCommand = (command: string): string => {
   return `-ERR unknown command '${command}'\r\n`;
 }
-
+console.log(process.argv)
 const PORT = parseInt(process.argv[3]) || 6397
-// Uncomment the code below to pass the first stage
+
 const server: net.Server = net.createServer((connection: net.Socket) => {
   const stringService = new StringService(store);
 
