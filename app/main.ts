@@ -16,6 +16,7 @@ const unknownCommand = (command: string): string => {
   return `-ERR unknown command '${command}'\r\n`;
 }
 
+const PORT = parseInt(process.argv[3]) || 6397
 // Uncomment the code below to pass the first stage
 const server: net.Server = net.createServer((connection: net.Socket) => {
   const stringService = new StringService(store);
@@ -93,4 +94,4 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
   })
 });
 
-server.listen(6379, "127.0.0.1");
+server.listen(PORT, "127.0.0.1");
