@@ -16,7 +16,7 @@ const parse = (data: string): string[] => {
 const unknownCommand = (command: string): string => {
   return `-ERR unknown command '${command}'\r\n`;
 }
-console.log(process.argv)
+console.log(process.argv[0])
 const PORT = parseInt(process.argv[2]) || 6397
 
 const server: net.Server = net.createServer((connection: net.Socket) => {
