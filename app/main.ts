@@ -22,7 +22,8 @@ import { createServer } from "./server";
 // const PORT = Number(argv[3]) || 6379
 // const REPLICATION_HOST = argv[5]
 
-const [, , port, isReplica, master] = argv;
+const [, , , port, isReplica, master] = argv;
+console.log(argv)
 createServer("1", Number(port), !!isReplica, master);
 // if (REPLICATION_HOST)
 
