@@ -3,4 +3,6 @@ export type ServerConfigDetails = {
   id: string;
   isReplica: boolean;
   master: string;
+  replid?: string;
+  replOffset?: number;
 };

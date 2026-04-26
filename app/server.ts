@@ -103,10 +103,19 @@ export function createServer(
   port: number,
   isReplica = false,
   master: string,
+  replid: string | undefined = undefined,
+  replOffset: number | undefined = undefined,
 ): net.Server {
-  replicationService.createReplica({ port, id: processId, isReplica, master });
+  replicationService.createReplica({
+    port,
+    id: processId,
+    isReplica,
+    master,
+    replid,
+    replOffset,
+  });
   defaultPort = port;
   server.listen(port);
-  console.log("running on port: ", port)
+  console.log("running on port: ", port);
   return server;
 }
