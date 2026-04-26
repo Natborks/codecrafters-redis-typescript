@@ -1,34 +1,8 @@
-import * as net from "net";
 import { argv } from "process";
-import Parser from "./parser/Parser";
-import Store from "./db/Store";
-import StreamService from "./service/StreamService";
-import StringService from "./service/StringService";
-import ReplicationService from "./service/ReplicationService";
 import { createServer } from "./server";
 
-// const store = new Store();
-// const streamService = new StreamService(store);
-// const replicationService = new ReplicationService()
-
-// const parse = (data: string): string[] => {
-//   const parser = new Parser(data);
-//   return parser.getParsedString();
-// }
-
-// const unknownCommand = (command: string): string => {
-//   return `-ERR unknown command '${command}'\r\n`;
-// }
-// const PORT = Number(argv[3]) || 6379
-// const REPLICATION_HOST = argv[5]
-
 const [, , ,port, isReplica, master] = argv;
-console.log(argv)
 createServer("1", Number(port || 6379), !!isReplica, master);
-// if (REPLICATION_HOST)
-
-// const server: net.Server = net.createServer((connection: net.Socket) => {
-//   const stringService = new StringService(store);
 
 //   // Handle connection
 //   connection.on('data', async (data: Buffer) => {
