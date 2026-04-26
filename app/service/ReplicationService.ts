@@ -18,7 +18,7 @@ export default class ReplicationService {
     return ResponseUtils.writeBulkString([
       "role:master",
       `master_replid:${config.replid}`,
-      `master_repl_offset:"${config.replOffset}`,
+      `master_repl_offset:${config.replOffset}`,
     ]);
   }
 
