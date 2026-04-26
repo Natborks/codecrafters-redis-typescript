@@ -10,15 +10,10 @@ export default class ReplicationService {
     if (!config) return ResponseUtils.writeSimpleError("No such service");
 
     if (config.isReplica) return ResponseUtils.writeBulkString(["role:slave"]);
-    console.log(console.log([
-      "role:master",
-      `master_replid:${config.replid}`,
-      `master_repl_offset${config.replOffset}`,
-    ].join(",")))
     return ResponseUtils.writeBulkString([
       "role:master",
       `master_replid:${config.replid}`,
-      `master_repl_offset${config.replOffset}`,
+      `master_repl_offset:"${config.replOffset}`,
     ]);
   }
 
