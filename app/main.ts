@@ -4,9 +4,11 @@ import Parser from "./parser/Parser";
 import Store from "./db/Store";
 import StreamService from "./service/StreamService";
 import StringService from "./service/StringService";
+import ReplicationService from "./service/ReplicationService";
 
 const store = new Store();
 const streamService = new StreamService(store);
+const replicationService = new ReplicationService()
 
 const parse = (data: string): string[] => {
   const parser = new Parser(data);
@@ -16,8 +18,6 @@ const parse = (data: string): string[] => {
 const unknownCommand = (command: string): string => {
   return `-ERR unknown command '${command}'\r\n`;
 }
-console.log(parseInt(process.argv[3]))
-console.log(argv, typeof argv[3], typeof argv[3])
 const PORT = Number(argv[3]) || 6379
 
 const server: net.Server = net.createServer((connection: net.Socket) => {
@@ -88,6 +88,9 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         break
       case "XREAD":
         connection.write(await streamService.xread(args))
+        break
+      case "INFO":
+        connection.write(replicationService.info(args))
         break
       default:
         connection.write(unknownCommand(command))
