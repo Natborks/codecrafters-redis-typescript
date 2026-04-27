@@ -22,12 +22,13 @@ export default class ReplicationService {
   }
    
   ping(args: string[], masterPort: number) {
+    console.log("pingin master port: ", masterPort)
     exec(`ping -c 1 localhost:${masterPort}`, (error, stdout, stderr) => {
       if (error) {
         console.error(`Error: ${error.message}`);
         return;
       }
-      console.log(stdout);
+      console.log("ping successfull");
     });
   }
 }
