@@ -28,17 +28,8 @@ const sendReplicaPing = (master: string) => {
 
   const masterConnection = net.connect(Number(rawPort), host);
   masterConnection.on("connect", () => {
-    masterConnection.write(ResponseUtils.writeArrayString(["PING"]), (err) => {
-      if (!err) {
-        masterConnection.write(
-          ResponseUtils.writeArrayString([
-            "REPLCONF",
-            "listening-port",
-            defaultPort.toString(),
-          ]),
-        );
-      }
-    });
+    masterConnection.write(ResponseUtils.writeArrayString(["PING"]));
+    masterConnection.write(ResponseUtils.writeArrayString(["REPLCONF", "listening-port", defaultPort.toString()]));
   });
 };
 
