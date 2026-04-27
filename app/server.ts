@@ -5,6 +5,7 @@ import StreamService from "./service/StreamService";
 import StringService from "./service/StringService";
 import ReplicationService from "./service/ReplicationService";
 import ResponseUtils from "./utils/ResponseUtils";
+import { once } from "events";
 
 const store = new Store();
 const streamService = new StreamService(store);
@@ -20,15 +21,13 @@ const unknownCommand = (command: string): string => {
   return `-ERR unknown command '${command}'\r\n`;
 };
 
-const sendReplicaPing = (master: string) => {
+const establishConnection = (master: string) => {
   const [host, rawPort] = master.trim().split(" ");
-  if (!host || !rawPort) {
-    throw new Error(`Invalid master address: ${master}`);
-  }
 
   const masterConnection = net.connect(Number(rawPort), host);
-  masterConnection.on("connect", () => {
+  masterConnection.on("connect", async () => {
     masterConnection.write(ResponseUtils.writeArrayString(["PING"]));
+    await once(masterConnection, "data")
     masterConnection.write(ResponseUtils.writeArrayString(["REPLCONF", "listening-port", defaultPort.toString()]));
   });
 };
@@ -133,7 +132,7 @@ export function createServer(
   console.log("running on port: ", port);
 
   if (isReplica) {
-    sendReplicaPing(master);
+    establishConnection(master);
   }
 
   return server;
