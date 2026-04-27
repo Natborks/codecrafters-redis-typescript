@@ -4,6 +4,7 @@ import Store from "./db/Store";
 import StreamService from "./service/StreamService";
 import StringService from "./service/StringService";
 import ReplicationService from "./service/ReplicationService";
+import ResponseUtils from "./utils/ResponseUtils";
 
 const store = new Store();
 const streamService = new StreamService(store);
@@ -27,7 +28,17 @@ const sendReplicaPing = (master: string) => {
 
   const masterConnection = net.connect(Number(rawPort), host);
   masterConnection.on("connect", () => {
-    masterConnection.write(replicationService.ping());
+    masterConnection.write(ResponseUtils.writeArrayString(["PING"]), (err) => {
+      if (!err) {
+        masterConnection.write(
+          ResponseUtils.writeArrayString([
+            "REPLCONF",
+            "listening-port",
+            defaultPort.toString(),
+          ]),
+        );
+      }
+    });
   });
 };
 
