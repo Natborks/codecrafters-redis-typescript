@@ -29,6 +29,9 @@ const establishConnection = (master: string) => {
     masterConnection.write(ResponseUtils.writeArrayString(["PING"]));
     await once(masterConnection, "data")
     masterConnection.write(ResponseUtils.writeArrayString(["REPLCONF", "listening-port", defaultPort.toString()]));
+    await once(masterConnection, "data")
+    masterConnection.write(ResponseUtils.writeArrayString(["REPLCONF", "capa", "psync2"]));
+
   });
 };
 
