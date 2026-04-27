@@ -19,8 +19,8 @@ export default class ReplicationService {
   createReplica(config: ServerConfigDetails) {
     RepliactionConfig.storeServerDetails(config);
   }
-   
-  ping() : string{
+
+  ping(): string {
     return ResponseUtils.writeArrayString(["PING"])
   }
 }
