@@ -9,6 +9,7 @@ const store = new Store();
 const streamService = new StreamService(store);
 const replicationService = new ReplicationService();
 let defaultPort = 0;
+let masterPort = ""
 
 const parse = (data: string): string[] => {
   const parser = new Parser(data);
@@ -91,6 +92,9 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "INFO":
         connection.write(replicationService.info(args, defaultPort));
         break;
+      case "PING":
+        replicationService.ping(args, Number(masterPort))
+        break;
       default:
         connection.write(unknownCommand(command));
         break;
@@ -115,6 +119,7 @@ export function createServer(
     replOffset,
   });
   defaultPort = port;
+  masterPort = master.split(" ")[0]
   server.listen(port);
   console.log("running on port: ", port);
   return server;

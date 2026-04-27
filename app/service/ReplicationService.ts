@@ -1,5 +1,5 @@
-import { config } from "process";
 import RepliactionConfig from "../db/ReplicationConfig";
+import { exec } from 'child_process';
 import type { ServerConfigDetails } from "../types/StoreTypes";
 import ResponseUtils from "../utils/ResponseUtils";
 
@@ -19,5 +19,15 @@ export default class ReplicationService {
 
   createReplica(config: ServerConfigDetails) {
     RepliactionConfig.storeServerDetails(config);
+  }
+   
+  ping(args: string[], masterPort: number) {
+    exec(`ping -c 1 localhost:${masterPort}`, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error: ${error.message}`);
+        return;
+      }
+      console.log(stdout);
+    });
   }
 }
