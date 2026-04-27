@@ -94,6 +94,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         break;
       case "PING":
         const [masterHost, masterPort] = masterHostPort 
+        console.log(masterHost, masterPort)
         const masterConnection = net.connect(Number(masterPort), masterHost)
         masterConnection.write(replicationService.ping())
         break;
