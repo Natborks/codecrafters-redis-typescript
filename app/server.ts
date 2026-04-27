@@ -19,6 +19,18 @@ const unknownCommand = (command: string): string => {
   return `-ERR unknown command '${command}'\r\n`;
 };
 
+const sendReplicaPing = (master: string) => {
+  const [host, rawPort] = master.trim().split(" ");
+  if (!host || !rawPort) {
+    throw new Error(`Invalid master address: ${master}`);
+  }
+
+  const masterConnection = net.connect(Number(rawPort), host);
+  masterConnection.on("connect", () => {
+    masterConnection.write(replicationService.ping());
+  });
+};
+
 const server: net.Server = net.createServer((connection: net.Socket) => {
   const stringService = new StringService(store);
 
@@ -117,5 +129,10 @@ export function createServer(
   defaultPort = port;
   server.listen(port);
   console.log("running on port: ", port);
+
+  if (isReplica) {
+    sendReplicaPing(master);
+  }
+
   return server;
 }
