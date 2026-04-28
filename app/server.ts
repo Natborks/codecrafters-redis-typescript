@@ -114,7 +114,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "PSYNC":
         connection.write(replicationService.psync(args))
         const emptyRDB = replicationService.getEmptyRDB()
-        connection.write(ResponseUtils.writeSimpleString(emptyRDB.length.toString()))
+        connection.write(ResponseUtils.writeBulkString([emptyRDB.length.toString()]))
         connection.write(new Uint8Array(emptyRDB.buffer, emptyRDB.byteOffset, emptyRDB.byteLength))
         break 
       default:
