@@ -113,9 +113,11 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         connection.write(replicationService.info(args, defaultPort));
         break;
       case "REPLCONF":
-      case "PSYNC":
         connection.write(ResponseUtils.writeSimpleString("OK"))
         break
+      case "PSYNC":
+        connection.write(replicationService.psync(args))
+        break 
       default:
         connection.write(unknownCommand(command));
         break;

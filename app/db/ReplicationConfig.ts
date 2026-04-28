@@ -9,4 +9,9 @@ export default class RepliactionConfig {
   static storeServerDetails(configDetails: ServerConfigDetails) {
     this.config.set(configDetails.port, { ...configDetails });
   }
+
+  static getMasterConfig(): ServerConfigDetails {
+    const config = [...this.config.values()].filter(config => config.master)
+    return config[0]
+  }
 }

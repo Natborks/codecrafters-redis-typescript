@@ -25,4 +25,10 @@ export default class ReplicationService {
   ping(): string {
     return ResponseUtils.writeArrayString(["PING"]);
   }
+
+  psync(arg: string[]): string {
+    const masterConfig = RepliactionConfig.getMasterConfig()
+    const replid = masterConfig.replid
+    return ResponseUtils.writeSimpleString(`FULLRESYNC ${replid} 0`)
+  }
 }
