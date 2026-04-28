@@ -36,6 +36,10 @@ const establishConnection = (master: string) => {
   });
 };
 
+const establishReplicaConnection = () => {
+
+}
+
 const server: net.Server = net.createServer((connection: net.Socket) => {
   const stringService = new StringService(store);
 
@@ -108,6 +112,9 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       case "INFO":
         connection.write(replicationService.info(args, defaultPort));
         break;
+      case "REPLCONF":
+        connection.write(ResponseUtils.writeSimpleString("OK"))
+        break
       default:
         connection.write(unknownCommand(command));
         break;
@@ -137,6 +144,8 @@ export function createServer(
 
   if (isReplica) {
     establishConnection(master);
+  } else {
+    establishReplicaConnection()
   }
 
   return server;
