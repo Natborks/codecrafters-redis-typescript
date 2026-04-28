@@ -28,7 +28,12 @@ export default class ReplicationService {
 
   psync(arg: string[]): string {
     const masterConfig = RepliactionConfig.getMasterConfig()
-    const replid = masterConfig.replid
-    return ResponseUtils.writeSimpleString(`FULLRESYNC ${replid} 0`)
+    if (masterConfig) {
+      const replid = masterConfig.replid
+      return ResponseUtils.writeSimpleString(`FULLRESYNC ${replid} 0`)
+    }
+
+   return ResponseUtils.writeSimpleString(`FULLRESYNC 0`) 
+
   }
 }
