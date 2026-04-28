@@ -11,7 +11,7 @@ export default class RepliactionConfig {
   }
 
   static getMasterConfig(): ServerConfigDetails {
-    const config = [...this.config.values()].filter(config => config.master)
+    const config = [...this.config.values()].filter(config => config.replid)
     return config[0]
   }
 }
