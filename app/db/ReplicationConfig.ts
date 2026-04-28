@@ -10,6 +10,7 @@ export default class RepliactionConfig {
     this.config.set(configDetails.port, { ...configDetails });
   }
 
+  //make this O(1)
   static getMasterConfig(): ServerConfigDetails {
     const config = [...this.config.values()].filter(config => config.replid)
     return config[0]

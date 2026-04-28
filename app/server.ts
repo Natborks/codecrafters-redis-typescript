@@ -36,10 +36,6 @@ const establishConnection = (master: string) => {
   });
 };
 
-const establishReplicaConnection = () => {
-
-}
-
 const server: net.Server = net.createServer((connection: net.Socket) => {
   const stringService = new StringService(store);
 
@@ -117,6 +113,9 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         break
       case "PSYNC":
         connection.write(replicationService.psync(args))
+        const emptyRDB = replicationService.getEmptyRDB()
+        connection.write(ResponseUtils.writeSimpleString(emptyRDB.length.toString()))
+        connection.write(new Uint8Array(emptyRDB.buffer, emptyRDB.byteOffset, emptyRDB.byteLength))
         break 
       default:
         connection.write(unknownCommand(command));
@@ -147,8 +146,6 @@ export function createServer(
 
   if (isReplica) {
     establishConnection(master);
-  } else {
-    establishReplicaConnection()
   }
 
   return server;
