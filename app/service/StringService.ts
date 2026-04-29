@@ -60,6 +60,7 @@ export default class StringService {
   }
 
   set(args: string[]): string {
+    console.log("WRITING ", args)
     const [key, val, ...options] = args;
     this.store.set(key, val, options);
     return ResponseUtils.writeSimpleString("OK");
