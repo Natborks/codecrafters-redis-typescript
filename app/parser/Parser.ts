@@ -13,6 +13,7 @@ export default class Parser {
   }
 
   parseTokens(tokens: string[]): string[] | string {
+    console.log("parsing tokens: ", tokens)
     const response = new Array();
     const [first, ...rest] = tokens;
     if (first[0] === "*") {
