@@ -31,14 +31,16 @@ const establishConnection = (master: string) => {
     masterConnection.write(ResponseUtils.writeArrayString(["REPLCONF", "capa", "psync2"]));
     await once(masterConnection, "data")
     masterConnection.write(ResponseUtils.writeArrayString(["PSYNC", "?", "-1"]))
-  });
-
+    
     masterConnection.on("data", async (data: Buffer) => {
     const [command, ...args] = parse(data.toString());
     if (!command) throw new Error("Command not found");
     replicationService.propagateCommand(data, command);
     await handleCommand(masterConnection, stringService, command, args);
   });
+  });
+
+
 };
 
 const handleCommand = async (
