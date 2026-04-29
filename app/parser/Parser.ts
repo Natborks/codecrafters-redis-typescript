@@ -25,7 +25,7 @@ export default class Parser {
     return response;
   }
 
-  private parseBulkString(tokens: string[]) {
+  private parseBulkString(tokens: string[]) : string[]{
     const response = [];
     for (const token of tokens) {
       const firstChar = token[0];
@@ -36,6 +36,8 @@ export default class Parser {
 
       response.push(token);
     }
+
+    return response
   }
 
   getParsedString() {
