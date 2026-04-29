@@ -164,7 +164,6 @@ const parse = (data: string): string[] => {
 // });
 
 class Server {
-  private connection: net.Socket;
   private server: net.Server;
   private stringService: StringService;
 
@@ -176,7 +175,7 @@ class Server {
     });
 
     if (config.isReplica) {
-      this.connection = this.establishConnection(config.master);
+      this.establishConnection(config.master);
     }
 
   }
