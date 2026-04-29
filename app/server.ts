@@ -38,6 +38,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
 
   // Handle connection
   connection.on("data", async (data: Buffer) => {
+    console.log(data.toString())
     const [command, ...args] = parse(data.toString());
     replicationService.propagateCommand(data, command);
 
