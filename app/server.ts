@@ -7,6 +7,7 @@ import ReplicationService from "./service/ReplicationService";
 import ResponseUtils from "./utils/ResponseUtils";
 import { once } from "events";
 
+//TODO clean this class up
 const store = new Store();
 const streamService = new StreamService(store);
 const replicationService = new ReplicationService();
