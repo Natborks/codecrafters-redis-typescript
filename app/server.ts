@@ -165,11 +165,9 @@ const parse = (data: string): string[][] => {
 
 class Server {
   private server: net.Server;
-  private stringService: StringService;
+
 
   constructor(config: ServerConfigDetails) {
-    this.stringService = new StringService(store);
-
     this.server = net.createServer((connection: net.Socket) => {
       this.handleMessage(connection);
     });
@@ -180,13 +178,15 @@ class Server {
   }
 
   handleMessage(connection: net.Socket) {
+    const stringService = new StringService(store);
+
     connection.on("data", async (data: Buffer) => {
       const commands = parse(data.toString());
       
       for (const fullCommand of commands) {
         const [command, ...args] = fullCommand
       replicationService.propagateCommand(data, command);
-      await this.handleCommand(connection, this.stringService, command, args);
+      await this.handleCommand(connection, stringService, command, args);
       }
 
     });
