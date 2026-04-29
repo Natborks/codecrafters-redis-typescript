@@ -182,11 +182,12 @@ class Server {
   handleMessage(connection: net.Socket) {
     connection.on("data", async (data: Buffer) => {
       const commands = parse(data.toString());
-      
+      const stringService = new StringService(store); 
+
       for (const fullCommand of commands) {
         const [command, ...args] = fullCommand
       replicationService.propagateCommand(data, command);
-      await this.handleCommand(connection, this.stringService, command, args);
+      await this.handleCommand(connection, stringService, command, args);
       }
 
     });
