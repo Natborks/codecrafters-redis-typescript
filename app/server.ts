@@ -14,7 +14,7 @@ const streamService = new StreamService(store);
 const replicationService = new ReplicationService();
 let defaultPort = 0;
 
-const parse = (data: string): string[] => {
+const parse = (data: string): string[][] => {
   const parser = new Parser(data);
   return parser.getParsedString();
 };
@@ -181,11 +181,14 @@ class Server {
 
   handleMessage(connection: net.Socket) {
     connection.on("data", async (data: Buffer) => {
-      const [command, ...args] = parse(data.toString());
-      console.log("SERVER PARSE: ", parse(data.toString()));
-      if (!command) throw new Error("Command not found");
+      const commands = parse(data.toString());
+      
+      for (const fullCommand of commands) {
+        const [command, ...args] = fullCommand
       replicationService.propagateCommand(data, command);
       await this.handleCommand(connection, this.stringService, command, args);
+      }
+
     });
   }
 
@@ -322,10 +325,12 @@ class Server {
       await once(masterConnection, "data");
 
       masterConnection.on("data", async (data: Buffer) => {
-        const [command, ...args] = parse(data.toString());
-        if (!command) return;
+        const commands = parse(data.toString());
 
-        await this.handleCommand(undefined, stringService, command, args);
+        for (const fullCommand of commands) {
+          const [command, ...args] = fullCommand
+          await this.handleCommand(undefined, stringService, command, args);
+        }
       });
     });
 

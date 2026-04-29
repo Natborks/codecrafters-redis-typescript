@@ -2,14 +2,13 @@ import Scanner from "./Scanner";
 
 export default class Parser {
   #source;
-  #parsedData: string[];
+  #parsedData: string[][];
 
   constructor(source: string) {
     this.#source = source;
     const scanner = new Scanner(this.#source);
     const tokens = scanner.scanTokens();
-    console.log("TOKENS: ", this.parseTokens(tokens));
-    this.#parsedData = tokens;
+    this.#parsedData = this.parseTokens(tokens);
   }
 
   parseTokens(tokens: string[]) {
@@ -42,25 +41,7 @@ export default class Parser {
     return result;
   }
 
-  private parseBulkString(tokens: string[]): string[] {
-    const response = [];
-    for (const token of tokens) {
-      const firstChar = token[0];
-      if (firstChar === "*") {
-        return this.parseTokens(tokens.slice(tokens.indexOf(token)));
-      }
-      if (token.length > 1) {
-        if ((firstChar === "*" && token.length > 1) || firstChar === "$")
-          continue;
-      }
-
-      response.push(token);
-    }
-
-    return response;
-  }
-
-  getParsedString() {
+  getParsedString() : string[][]{
     return this.#parsedData;
   }
 }
