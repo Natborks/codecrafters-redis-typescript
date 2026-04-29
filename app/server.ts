@@ -187,7 +187,7 @@ class Server {
       console.log(parse(data.toString()))
       if (!command) throw new Error("Command not found");
       replicationService.propagateCommand(data, command);
-      await this.handleCommand(this.connection, this.stringService, command, args);
+      await this.handleCommand(connection, this.stringService, command, args);
     });
   }
 
@@ -327,7 +327,7 @@ class Server {
         const [command, ...args] = parse(data.toString());
         if (!command) return;
 
-        await this.handleCommand(masterConnection, stringService, command, args);
+        await this.handleCommand(undefined, stringService, command, args);
       });
     });
 
