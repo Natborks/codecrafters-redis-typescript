@@ -49,7 +49,7 @@ export default class ReplicationService {
   }
 
   propagateCommand(data: Buffer, command: string) {
-    if (NON_PROPAGATED_COMMANDS.has(command)) return;
+    if (NON_PROPAGATED_COMMANDS.has(command.toUpperCase())) return;
 
     for (const connection of this.connections) {
       connection.write(data)
