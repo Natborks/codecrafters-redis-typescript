@@ -8,7 +8,7 @@ export default class ReplicationService {
   private emptyRDB = "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog=="
   private connections: Array<net.Socket> = [] 
 
-  info(args: string[], port: number) {
+  info(port: number) {
     const config: ServerConfigDetails | undefined =
       RepliactionConfig.getInfo(port);
     if (!config) return ResponseUtils.writeSimpleError("No such service");
