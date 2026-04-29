@@ -5,10 +5,10 @@ export default class Parser {
   #parsedData: string[];
 
   constructor(source: string) {
-    console.log(source)
     this.#source = source;
     const scanner = new Scanner(this.#source);
     const tokens = scanner.scanTokens();
+    console.log("TOKENS: ", tokens)
     this.#parsedData = tokens;
   }
 

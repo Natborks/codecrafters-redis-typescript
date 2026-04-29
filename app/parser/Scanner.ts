@@ -8,11 +8,11 @@ export default class Scanner {
   scanTokens(): string[] {
     const tokens = [];
     for (const token of this.#source) {
-      const firstChar = token[0];
-      if (token.length > 1) {
-        if ((firstChar === "*" && token.length > 1) || firstChar === "$")
-          continue;
-      }
+      // const firstChar = token[0];
+      // if (token.length > 1) {
+      //   if ((firstChar === "*" && token.length > 1) || firstChar === "$")
+      //     continue;
+      // }
       tokens.push(token);
     }
 
