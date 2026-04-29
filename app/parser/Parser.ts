@@ -12,44 +12,42 @@ export default class Parser {
     this.#parsedData = tokens;
   }
 
-  parseTokens(tokens: string[]): any{
-    let idx = 0
-    const result = []
+  parseTokens(tokens: string[]) {
+    let idx = 0;
+    const result = [];
 
     while (idx < tokens.length) {
-      const buldString = []
-      let count = idx++
-      while (tokens[count][0] !== "*") {
-        if (tokens[count][0] === "$") {
-          continue
-        }
-        buldString.push(tokens[idx])
-        count += 1
+      if (tokens[idx][0] !== "*") {
+        idx += 1;
+        continue;
       }
 
-      idx =  count
-      result.push(buldString)
+      const count = parseInt(tokens[idx].slice(1), 10);
+      idx += 1;
+
+      const bulkString = [];
+
+      for (let i = 0; i < count && idx < tokens.length; i++) {
+        if (tokens[idx][0] === "$") {
+          idx += 1;
+        }
+
+        bulkString.push(tokens[idx]);
+        idx += 1;
+      }
+
+      result.push(bulkString);
     }
 
-    return result
-    // console.log("parsing tokens: ", tokens)
-    // const response = new Array();
-    // const [first, ...rest] = tokens;
-    // if (first[0] === "*") {
-    //   response.push(this.parseTokens(rest));
-    // } else if (first === "$") {
-    //   response.push(this.parseBulkString(rest));
-    // }
-
-    // return response;
+    return result;
   }
 
-  private parseBulkString(tokens: string[]) : string[]{
+  private parseBulkString(tokens: string[]): string[] {
     const response = [];
     for (const token of tokens) {
       const firstChar = token[0];
       if (firstChar === "*") {
-        return this.parseTokens(tokens.slice(tokens.indexOf(token)))
+        return this.parseTokens(tokens.slice(tokens.indexOf(token)));
       }
       if (token.length > 1) {
         if ((firstChar === "*" && token.length > 1) || firstChar === "$")
@@ -59,7 +57,7 @@ export default class Parser {
       response.push(token);
     }
 
-    return response
+    return response;
   }
 
   getParsedString() {

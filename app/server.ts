@@ -182,7 +182,7 @@ class Server {
   handleMessage(connection: net.Socket) {
     connection.on("data", async (data: Buffer) => {
       const [command, ...args] = parse(data.toString());
-      console.log("SERVER PARSE: ",parse(data.toString()));
+      console.log("SERVER PARSE: ", parse(data.toString()));
       if (!command) throw new Error("Command not found");
       replicationService.propagateCommand(data, command);
       await this.handleCommand(connection, this.stringService, command, args);
@@ -295,7 +295,7 @@ class Server {
     connection.write(response);
   };
 
-  async establishConnection (master: string) {
+  async establishConnection(master: string) {
     const [host, rawPort] = master.trim().split(" ");
     const masterConnection = await net.connect(Number(rawPort), host);
     const stringService = new StringService(store);
@@ -330,7 +330,7 @@ class Server {
     });
 
     return masterConnection;
-  };
+  }
 
   listen(port: number) {
     this.server.listen(port);
