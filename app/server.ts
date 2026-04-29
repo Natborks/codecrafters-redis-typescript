@@ -182,7 +182,7 @@ class Server {
   handleMessage(connection: net.Socket) {
     connection.on("data", async (data: Buffer) => {
       const [command, ...args] = parse(data.toString());
-      console.log(parse(data.toString()));
+      console.log("SERVER PARSE: ",parse(data.toString()));
       if (!command) throw new Error("Command not found");
       replicationService.propagateCommand(data, command);
       await this.handleCommand(connection, this.stringService, command, args);
