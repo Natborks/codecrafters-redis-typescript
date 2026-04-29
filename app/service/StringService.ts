@@ -78,6 +78,7 @@ export default class StringService {
   }
 
   get(args: string[]): string {
+    console.log("ARGS: ", args)
     const [query] = args;
     const result = this.store.get(query);
     return result
