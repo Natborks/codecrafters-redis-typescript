@@ -170,20 +170,21 @@ class Server {
 
   constructor(config: ServerConfigDetails) {
     this.stringService = new StringService(store);
+    
     this.server = net.createServer((connection: net.Socket) => {
-      this.connection = connection;
+      this.handleMessage(connection)
     });
 
     if (config.isReplica) {
       this.connection = this.establishConnection(config.master);
     }
 
-    this.handleMessage();
   }
 
-  handleMessage() {
-    this.connection.on("data", async (data: Buffer) => {
+  handleMessage(connection: net.Socket) {
+    connection.on("data", async (data: Buffer) => {
       const [command, ...args] = parse(data.toString());
+      console.log(parse(data.toString()))
       if (!command) throw new Error("Command not found");
       replicationService.propagateCommand(data, command);
       await this.handleCommand(this.connection, this.stringService, command, args);
@@ -326,7 +327,7 @@ class Server {
         const [command, ...args] = parse(data.toString());
         if (!command) return;
 
-        await this.handleCommand(undefined, stringService, command, args);
+        await this.handleCommand(masterConnection, stringService, command, args);
       });
     });
 
