@@ -295,9 +295,9 @@ class Server {
     connection.write(response);
   };
 
-  establishConnection = (master: string) => {
+  async establishConnection (master: string) {
     const [host, rawPort] = master.trim().split(" ");
-    const masterConnection = net.connect(Number(rawPort), host);
+    const masterConnection = await net.connect(Number(rawPort), host);
     const stringService = new StringService(store);
 
     masterConnection.on("connect", async () => {
