@@ -18,7 +18,7 @@ export default class Parser {
 
     while (idx < tokens.length) {
       const buldString = []
-      let count = idx
+      let count = idx++
       while (tokens[count][0] !== "*") {
         if (tokens[count][0] === "$") {
           continue
