@@ -42,6 +42,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
 
   // Handle connection
   connection.on("data", async (data: Buffer) => {
+    replicationService.propagateCommand(data)
     const [command, ...args] = parse(data.toString());
     if (!command) throw new Error("Command not found");
 
@@ -117,6 +118,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const emptyRDB = replicationService.getEmptyRDB()
         connection.write(`$${emptyRDB.length}\r\n`);
         connection.write(new Uint8Array(emptyRDB.buffer, emptyRDB.byteOffset, emptyRDB.byteLength))
+        replicationService.addConnection(connection)
         break 
       default:
         connection.write(unknownCommand(command));
