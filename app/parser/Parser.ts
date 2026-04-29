@@ -31,6 +31,7 @@ export default class Parser {
       result.push(buldString)
     }
 
+    return result
     // console.log("parsing tokens: ", tokens)
     // const response = new Array();
     // const [first, ...rest] = tokens;
