@@ -38,94 +38,92 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
 
   // Handle connection
   connection.on("data", async (data: Buffer) => {
-    console.log(data.toString())
     const [command, ...args] = parse(data.toString());
+    if (!command) throw new Error("Command not found");
     replicationService.propagateCommand(data, command);
 
     switch (command.toUpperCase()) {
       case "PING":
-        write(stringService.ping(), connection);
+        connection.write(stringService.ping());
         break;
       case "ECHO":
-        write(stringService.echo(args), connection);
+        connection.write(stringService.echo(args));
         break;
       case "SET":
-        write(stringService.set(args), connection);
+        connection.write(stringService.set(args));
         break;
       case "RPUSH":
-        write(stringService.rpush(args), connection);
+        connection.write(stringService.rpush(args));
         break;
       case "LPUSH":
-        write(stringService.lpush(args), connection);
+        connection.write(stringService.lpush(args));
         break;
       case "GET":
-        write(stringService.get(args), connection);
+        connection.write(stringService.get(args));
         break;
       case "MULTI":
-        write(stringService.multi(), connection);
+        connection.write(stringService.multi());
         break;
       case "EXEC":
-        write(stringService.exec(), connection);
+        connection.write(stringService.exec());
         break;
       case "DISCARD":
-        write(stringService.discard(), connection);
+        connection.write(stringService.discard());
         break;
       case "INCR":
-        write(stringService.incr(args), connection);
+        connection.write(stringService.incr(args));
         break;
       case "LRANGE":
-        write(stringService.lrange(args), connection);
+        connection.write(stringService.lrange(args));
         break;
       case "LLEN":
-        write(stringService.llen(args), connection);
+        connection.write(stringService.llen(args));
         break;
       case "LPOP":
-        write(stringService.lpop(args), connection);
+        connection.write(stringService.lpop(args));
         break;
       case "BLPOP":
-        write(await stringService.blpop(args), connection);
+        connection.write(await stringService.blpop(args));
         break;
       case "TYPE":
-        write(await stringService.getType(args), connection);
+        connection.write(await stringService.getType(args));
         break;
       case "WATCH":
-        write(stringService.watch(args), connection);
+        connection.write(stringService.watch(args));
         break;
       case "UNWATCH":
-        write(stringService.unwatch(args), connection);
+        connection.write(stringService.unwatch(args));
         break;
       case "XADD":
-        write(streamService.xadd(args), connection);
+        connection.write(streamService.xadd(args));
         break;
       case "XRANGE":
-        write(streamService.xrange(args), connection);
+        connection.write(streamService.xrange(args));
         break;
       case "XREAD":
-        write(await streamService.xread(args), connection);
+        connection.write(await streamService.xread(args));
         break;
       case "INFO":
-        write(replicationService.info(defaultPort), connection);
+        connection.write(replicationService.info(defaultPort));
         break;
       case "REPLCONF":
-        write(ResponseUtils.writeSimpleString("OK"), connection)
+        connection.write(ResponseUtils.writeSimpleString("OK"))
         break
       case "PSYNC":
-        write(replicationService.psync(args), connection)
+        connection.write(replicationService.psync(args))
         const emptyRDB = replicationService.getEmptyRDB()
-        write(`$${emptyRDB.length}\r\n`, connection);
-        write(new Uint8Array(emptyRDB.buffer, emptyRDB.byteOffset, emptyRDB.byteLength), connection)
+        connection.write(`$${emptyRDB.length}\r\n`);
+        connection.write(new Uint8Array(emptyRDB.buffer, emptyRDB.byteOffset, emptyRDB.byteLength))
         replicationService.addConnection(connection)
         break 
       default:
-        write(ResponseUtils.writeSimpleError("unknown command"), connection);
+        connection.write(ResponseUtils.writeSimpleError("unknown command"));
         break;
     }
   });
 });
 
-function write(response: string | Uint8Array, connection: net.Socket) {
-  connection.write(response)
-}
+
 
 export function createServer(
   processId: string,
