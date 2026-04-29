@@ -178,10 +178,11 @@ class Server {
   }
 
   handleMessage(connection: net.Socket) {
-    const stringService = new StringService(store);
+
 
     connection.on("data", async (data: Buffer) => {
       const commands = parse(data.toString());
+      const stringService = new StringService(store);
       
       for (const fullCommand of commands) {
         const [command, ...args] = fullCommand
