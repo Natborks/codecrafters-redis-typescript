@@ -169,21 +169,20 @@ class Server {
 
   constructor(config: ServerConfigDetails) {
     this.stringService = new StringService(store);
-    
+
     this.server = net.createServer((connection: net.Socket) => {
-      this.handleMessage(connection)
+      this.handleMessage(connection);
     });
 
     if (config.isReplica) {
       this.establishConnection(config.master);
     }
-
   }
 
   handleMessage(connection: net.Socket) {
     connection.on("data", async (data: Buffer) => {
       const [command, ...args] = parse(data.toString());
-      console.log(parse(data.toString()))
+      console.log(parse(data.toString()));
       if (!command) throw new Error("Command not found");
       replicationService.propagateCommand(data, command);
       await this.handleCommand(connection, this.stringService, command, args);
@@ -334,8 +333,8 @@ class Server {
   };
 
   listen(port: number) {
-    this.server.listen(port)
-  } 
+    this.server.listen(port);
+  }
 }
 
 export function createServer(
@@ -355,7 +354,14 @@ export function createServer(
     replOffset,
   });
   defaultPort = port;
-  const server = new Server({port, id:processId, isReplica, master, replid, replOffset})
+  const server = new Server({
+    port,
+    id: processId,
+    isReplica,
+    master,
+    replid,
+    replOffset,
+  });
   server.listen(port);
   console.log("running on port: ", port);
 
