@@ -124,10 +124,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
 });
 
 function write(response: string | Uint8Array, connection: net.Socket) {
-  console.log(response)
-  const info = replicationService.info(defaultPort)
-  console.log(info)
-  if (info.includes("slave")) connection.write(response)
+  connection.write(response)
 }
 
 export function createServer(
