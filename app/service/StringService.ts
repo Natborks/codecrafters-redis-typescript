@@ -60,7 +60,6 @@ export default class StringService {
   }
 
   set(args: string[]): string {
-    console.log("WRITING ", args)
     const [key, val, ...options] = args;
     this.store.set(key, val, options);
     return ResponseUtils.writeSimpleString("OK");
@@ -79,7 +78,6 @@ export default class StringService {
   }
 
   get(args: string[]): string {
-    console.log("ARGS: ", args)
     const [query] = args;
     const result = this.store.get(query);
     return result
