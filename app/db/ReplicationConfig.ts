@@ -3,9 +3,8 @@ import * as net from "net";
 
 export default class RepliactionConfig {
   static config: Map<number, ServerConfigDetails> = new Map();
-  static REPLICA_CONNECTIONS: Map<string, net.Socket> = new Map();
 
-  static getInfo(port: number): ServerConfigDetails | undefined {
+ static getInfo(port: number): ServerConfigDetails | undefined {
     return this.config.get(port);
   }
   static storeServerDetails(configDetails: ServerConfigDetails) {
