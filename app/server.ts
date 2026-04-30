@@ -335,6 +335,7 @@ class Server {
     connection: net.Socket | undefined,
     response: string | Uint8Array,
   ) => {
+    console.log("CONNECTION: ", !!connection)
     if (!connection) return;
     connection.write(response);
   };
