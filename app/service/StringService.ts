@@ -8,14 +8,14 @@ export default class StringService {
   static requestQueue: Map<string, Array<() => void>> = new Map();
   static isQueueDrainRegsitered = false;
   private ITEM_ADDED = "item added";
-  private execQueue: Array<{ key: string; command: () => string }>;
+  private execModeQueue: Array<{ key: string; command: () => string }>;
   private execMode = false;
   private watchQueue = new WatchQueue();
 
   constructor(private store: Store) {
     this.registerQueueDrain();
     this.registerWatchEventHandler();
-    this.execQueue = [];
+    this.execModeQueue = [];
 
     return new Proxy(this, {
       get(target, prop, receiver) {
@@ -31,7 +31,6 @@ export default class StringService {
           prop === "unwatch"
         ) {
           return method;
-          // return typeof method === "function" ? method.bind(target) : method
         }
 
         return (...args: unknown[]) => {
@@ -41,7 +40,7 @@ export default class StringService {
             return method.apply(target, args);
           }
 
-          target.execQueue.push({
+          target.execModeQueue.push({
             key,
             command: () => method.apply(target, args),
           });
@@ -110,14 +109,14 @@ export default class StringService {
 
     if (this.hasModifiedWatchedKeys()) {
       this.execMode = false;
-      this.execQueue = [];
+      this.execModeQueue = [];
       this.watchQueue.drain();
       return ResponseUtils.writeNullArray();
     }
 
-    const queuedCommands = this.execQueue;
+    const queuedCommands = this.execModeQueue;
     const responses: string[] = [];
-    this.execQueue = [];
+    this.execModeQueue = [];
     this.execMode = false;
     this.watchQueue.drain();
 
@@ -132,7 +131,7 @@ export default class StringService {
   discard(): string {
     if (!this.execMode)
       return ResponseUtils.writeSimpleError("ERR DISCARD without MULTI");
-    this.execQueue = [];
+    this.execModeQueue = [];
     this.execMode = false;
     this.watchQueue.drain();
     return ResponseUtils.writeSimpleString("OK");
@@ -259,3 +258,11 @@ export default class StringService {
     return false;
   }
 }
+
+const stringService = new StringService(new Store());
+
+console.log(stringService.multi());
+const res = stringService.set(["foo", "48"]);
+const res1 = stringService.set(["foo", "48"]);
+const res2 = stringService.set(["foo", "48"]);
+console.log(stringService.exec());

@@ -41,7 +41,7 @@ export default class Parser {
     return result;
   }
 
-  getParsedString() : string[][]{
+  getParsedString(): string[][] {
     return this.#parsedData;
   }
 }

@@ -165,32 +165,69 @@ const parse = (data: string): string[][] => {
 
 class Server {
   private server: net.Server;
-  private stringService: StringService;
 
   constructor(config: ServerConfigDetails) {
-    this.stringService = new StringService(store);
 
     this.server = net.createServer((connection: net.Socket) => {
-      this.handleMessage(connection);
+      if (!config.isReplica) this.handleMessage(connection);
     });
 
     if (config.isReplica) {
-      this.establishConnection(config.master);
+      const connection = this.establishConnectionWithMaster(config.master);
+      this.handleMessage(connection)
     }
   }
 
   handleMessage(connection: net.Socket) {
     connection.on("data", async (data: Buffer) => {
       const commands = parse(data.toString());
-      const stringService = new StringService(store); 
+      const stringService = new StringService(store);
 
       for (const fullCommand of commands) {
-        const [command, ...args] = fullCommand
-      replicationService.propagateCommand(data, command);
-      await this.handleCommand(connection, stringService, command, args);
+        const [command, ...args] = fullCommand;
+        replicationService.propagateCommand(data, command);
+        await this.handleCommand(connection, stringService, command, args);
       }
-
     });
+  }
+
+    establishConnectionWithMaster(master: string) {
+    const [host, rawPort] = master.trim().split(" ");
+    const masterConnection = net.connect(Number(rawPort), host);
+
+    masterConnection.on("connect", async () => {
+      masterConnection.write(ResponseUtils.writeArrayString(["PING"]));
+      await once(masterConnection, "data");
+      masterConnection.write(
+        ResponseUtils.writeArrayString([
+          "REPLCONF",
+          "listening-port",
+          defaultPort.toString(),
+        ]),
+      );
+      await once(masterConnection, "data");
+      masterConnection.write(
+        ResponseUtils.writeArrayString(["REPLCONF", "capa", "psync2"]),
+      );
+      await once(masterConnection, "data");
+      masterConnection.write(
+        ResponseUtils.writeArrayString(["PSYNC", "?", "-1"]),
+      );
+      await once(masterConnection, "data");
+      await once(masterConnection, "data");
+
+      // masterConnection.on("data", async (data: Buffer) => {
+      //   const stringService = new StringService(store);
+      //   const commands = parse(data.toString());
+
+      //   for (const fullCommand of commands) {
+      //     const [command, ...args] = fullCommand;
+      //     await this.handleCommand(undefined, stringService, command, args);
+      //   }
+      // });
+    });
+
+    return masterConnection;
   }
 
   handleCommand = async (
@@ -298,45 +335,6 @@ class Server {
     if (!connection) return;
     connection.write(response);
   };
-
-  async establishConnection(master: string) {
-    const [host, rawPort] = master.trim().split(" ");
-    const masterConnection = await net.connect(Number(rawPort), host);
-    const stringService = new StringService(store);
-
-    masterConnection.on("connect", async () => {
-      masterConnection.write(ResponseUtils.writeArrayString(["PING"]));
-      await once(masterConnection, "data");
-      masterConnection.write(
-        ResponseUtils.writeArrayString([
-          "REPLCONF",
-          "listening-port",
-          defaultPort.toString(),
-        ]),
-      );
-      await once(masterConnection, "data");
-      masterConnection.write(
-        ResponseUtils.writeArrayString(["REPLCONF", "capa", "psync2"]),
-      );
-      await once(masterConnection, "data");
-      masterConnection.write(
-        ResponseUtils.writeArrayString(["PSYNC", "?", "-1"]),
-      );
-      await once(masterConnection, "data");
-      await once(masterConnection, "data");
-
-      masterConnection.on("data", async (data: Buffer) => {
-        const commands = parse(data.toString());
-
-        for (const fullCommand of commands) {
-          const [command, ...args] = fullCommand
-          await this.handleCommand(undefined, stringService, command, args);
-        }
-      });
-    });
-
-    return masterConnection;
-  }
 
   listen(port: number) {
     this.server.listen(port);
