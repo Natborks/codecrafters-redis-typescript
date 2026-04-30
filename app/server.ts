@@ -183,6 +183,9 @@ class Server {
       const commands = parse(data.toString());
       const stringService = new StringService(store);
 
+      console.log("CONNECTION: ", connection)
+      console.log("COMMANDS: ", commands)
+
       for (const fullCommand of commands) {
         const [command, ...args] = fullCommand;
         replicationService.propagateCommand(data, command);
