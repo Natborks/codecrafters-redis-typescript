@@ -335,7 +335,7 @@ class Server {
     response: string | Uint8Array,
   ) => {
     console.log("CONNECTION: ", !!connection)
-    if (!connection || connection === this.masterConnection) return;
+    if (!connection) return;
     connection.write(response);
   };
 
