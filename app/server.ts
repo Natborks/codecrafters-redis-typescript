@@ -234,7 +234,6 @@ class Server {
       // });
     });
 
-    return masterConnection;
   }
 
   handleCommand = async (
