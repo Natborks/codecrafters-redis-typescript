@@ -197,7 +197,7 @@ class Server {
     const [host, rawPort] = master.trim().split(" ");
     const masterConnection = net.connect(Number(rawPort), host);
 
-    masterConnection.once("connect", async () => {
+    masterConnection.on("connect", async () => {
       masterConnection.write(ResponseUtils.writeArrayString(["PING"]));
       await once(masterConnection, "data");
       masterConnection.write(
