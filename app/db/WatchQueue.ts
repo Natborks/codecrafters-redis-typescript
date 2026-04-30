@@ -37,8 +37,6 @@ export default class WatchQueue {
   }
 
   stopWatching(key: string) {
-    console.log("REMOVING ", key);
-    console.log(this.watchQueue.entries);
     this.watchQueue.delete(key);
   }
 }
