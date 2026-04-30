@@ -167,14 +167,12 @@ class Server {
   private server: net.Server;
   private masterConnection: net.Socket | null = null
 
-  constructor(config: ServerConfigDetails) {
+  constructor(private config: ServerConfigDetails) {
 
-    this.server = net.createServer()
-    .on("connection", () => {
-      if (config.isReplica) this.establishConnectionWithMaster(config.master)
-    }).on("data", (connection: net.Socket) => {
-       this.handleMessage(connection);
-    })
+    this.server = net.createServer((connection: net.Socket) => {
+      this.handleMessage(connection);
+    });
+
   }
 
   async handleMessage(connection: net.Socket) {
@@ -197,7 +195,7 @@ class Server {
     const [host, rawPort] = master.trim().split(" ");
     const masterConnection = net.connect(Number(rawPort), host);
 
-    masterConnection.on("connect", async () => {
+    masterConnection.once("connect", async () => {
       masterConnection.write(ResponseUtils.writeArrayString(["PING"]));
       await once(masterConnection, "data");
       masterConnection.write(
@@ -220,15 +218,15 @@ class Server {
 
       this.masterConnection = masterConnection
 
-      masterConnection.on("data", async (data: Buffer) => {
-        const stringService = new StringService(store);
-        const commands = parse(data.toString());
+      // masterConnection.on("data", async (data: Buffer) => {
+      //   const stringService = new StringService(store);
+      //   const commands = parse(data.toString());
 
-        for (const fullCommand of commands) {
-          const [command, ...args] = fullCommand;
-          await this.handleCommand(undefined, stringService, command, args);
-        }
-      });
+      //   for (const fullCommand of commands) {
+      //     const [command, ...args] = fullCommand;
+      //     await this.handleCommand(undefined, stringService, command, args);
+      //   }
+      // });
     });
 
   }
@@ -343,6 +341,7 @@ class Server {
 
   listen(port: number) {
     this.server.listen(port);
+    if (this.config.isReplica) this.establishConnectionWithMaster(this.config.master)
   }
 }
 
