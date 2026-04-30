@@ -178,9 +178,6 @@ class Server {
     connection.on("data", async (data: Buffer) => {
       const commands = parse(data.toString());
 
-      console.log("CONNECTION: ", connection.localPort);
-      console.log("COMMANDS: ", commands);
-
       for (const fullCommand of commands) {
         const [command, ...args] = fullCommand;
         replicationService.propagateCommand(data, command);
@@ -215,9 +212,6 @@ class Server {
       );
       await once(masterConnection, "data");
       await once(masterConnection, "data");
-
-      this.masterConnection = masterConnection;
-
 
       masterConnection.on("data", async (data: Buffer) => {
         const stringService = new StringService(store);
