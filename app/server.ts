@@ -174,7 +174,7 @@ class Server {
 
     if (config.isReplica) {
       const connection = this.establishConnectionWithMaster(config.master);
-      this.handleMessage(connection)
+      // this.handleMessage(connection)
     }
   }
 
@@ -219,15 +219,15 @@ class Server {
       await once(masterConnection, "data");
       await once(masterConnection, "data");
 
-      // masterConnection.on("data", async (data: Buffer) => {
-      //   const stringService = new StringService(store);
-      //   const commands = parse(data.toString());
+      masterConnection.on("data", async (data: Buffer) => {
+        const stringService = new StringService(store);
+        const commands = parse(data.toString());
 
-      //   for (const fullCommand of commands) {
-      //     const [command, ...args] = fullCommand;
-      //     await this.handleCommand(undefined, stringService, command, args);
-      //   }
-      // });
+        for (const fullCommand of commands) {
+          const [command, ...args] = fullCommand;
+          await this.handleCommand(undefined, stringService, command, args);
+        }
+      });
     });
 
     return masterConnection;
