@@ -232,7 +232,6 @@ class Server {
     command: string,
     args: string[],
   ) => {
-    console.log("handling command: ", !!connection);
     switch (command.toUpperCase()) {
       case "PING":
         this.write(connection, stringService.ping());
@@ -329,7 +328,6 @@ class Server {
     connection: net.Socket | undefined,
     response: string | Uint8Array,
   ) => {
-    console.log("CONNECTION: ", !!connection);
     if (!connection) return;
     connection.write(response);
   };
@@ -369,10 +367,6 @@ export function createServer(
   });
   server.listen(port);
   console.log("running on port: ", port);
-
-  // if (isReplica) {
-  //   establishConnection(master);
-  // }
 
   return server;
 }
