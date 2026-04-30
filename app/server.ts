@@ -169,11 +169,12 @@ class Server {
 
   constructor(config: ServerConfigDetails) {
 
-    this.server = net.createServer((connection: net.Socket) => {
-      // if (config.isReplica) this.establishConnectionWithMaster(config.master)
-      this.handleMessage(connection);
-    });
-
+    this.server = net.createServer()
+    .on("connection", () => {
+      if (config.isReplica) this.establishConnectionWithMaster(config.master)
+    }).on("data", (connection: net.Socket) => {
+       this.handleMessage(connection);
+    })
   }
 
   async handleMessage(connection: net.Socket) {
