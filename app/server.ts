@@ -178,6 +178,9 @@ class Server {
     connection.on("data", async (data: Buffer) => {
       const commands = parse(data.toString());
 
+      console.log("CONNECTION: ", connection.localPort);
+      console.log("COMMANDS: ", commands);
+
       for (const fullCommand of commands) {
         const [command, ...args] = fullCommand;
         replicationService.propagateCommand(data, command);
@@ -213,6 +216,9 @@ class Server {
       await once(masterConnection, "data");
       await once(masterConnection, "data");
 
+      this.masterConnection = masterConnection;
+
+
       masterConnection.on("data", async (data: Buffer) => {
         const stringService = new StringService(store);
         const commands = parse(data.toString());
@@ -232,6 +238,7 @@ class Server {
     command: string,
     args: string[],
   ) => {
+    console.log("handling command: ", !!connection);
     switch (command.toUpperCase()) {
       case "PING":
         this.write(connection, stringService.ping());
@@ -328,6 +335,7 @@ class Server {
     connection: net.Socket | undefined,
     response: string | Uint8Array,
   ) => {
+    console.log("CONNECTION: ", !!connection);
     if (!connection) return;
     connection.write(response);
   };
@@ -367,6 +375,10 @@ export function createServer(
   });
   server.listen(port);
   console.log("running on port: ", port);
+
+  // if (isReplica) {
+  //   establishConnection(master);
+  // }
 
   return server;
 }
