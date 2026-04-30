@@ -183,7 +183,7 @@ class Server {
       const commands = parse(data.toString());
       const stringService = new StringService(store);
 
-      console.log("CONNECTION: ", connection)
+      console.log("CONNECTION: ", connection.localPort)
       console.log("COMMANDS: ", commands)
 
       for (const fullCommand of commands) {
