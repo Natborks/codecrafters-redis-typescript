@@ -174,13 +174,9 @@ class Server {
       this.handleMessage(connection);
     });
 
-    // if (config.isReplica) {
-    //   const connection = this.establishConnectionWithMaster(config.master);
-    //   // this.handleMessage(connection)
-    // }
   }
 
-  handleMessage(connection: net.Socket) {
+  async handleMessage(connection: net.Socket) {
     connection.on("data", async (data: Buffer) => {
       const commands = parse(data.toString());
       const stringService = new StringService(store);
