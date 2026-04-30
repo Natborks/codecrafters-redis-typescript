@@ -170,8 +170,8 @@ class Server {
   constructor(config: ServerConfigDetails) {
 
     this.server = net.createServer((connection: net.Socket) => {
-      this.handleMessage(connection);
       if (config.isReplica) this.establishConnectionWithMaster(config.master)
+      this.handleMessage(connection);
     });
 
     // if (config.isReplica) {
