@@ -258,11 +258,3 @@ export default class StringService {
     return false;
   }
 }
-
-const stringService = new StringService(new Store());
-
-console.log(stringService.multi());
-const res = stringService.set(["foo", "48"]);
-const res1 = stringService.set(["foo", "48"]);
-const res2 = stringService.set(["foo", "48"]);
-console.log(stringService.exec());

@@ -239,6 +239,7 @@ class Server {
     command: string,
     args: string[],
   ) => {
+    console.log("handling command: ", !!connection)
     switch (command.toUpperCase()) {
       case "PING":
         this.write(connection, stringService.ping());
