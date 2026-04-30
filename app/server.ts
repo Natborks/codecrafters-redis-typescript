@@ -165,17 +165,19 @@ const parse = (data: string): string[][] => {
 
 class Server {
   private server: net.Server;
+  private masterConnection: net.Socket | null = null
 
   constructor(config: ServerConfigDetails) {
 
     this.server = net.createServer((connection: net.Socket) => {
       this.handleMessage(connection);
+      if (config.isReplica) this.establishConnectionWithMaster(config.master)
     });
 
-    if (config.isReplica) {
-      const connection = this.establishConnectionWithMaster(config.master);
-      // this.handleMessage(connection)
-    }
+    // if (config.isReplica) {
+    //   const connection = this.establishConnectionWithMaster(config.master);
+    //   // this.handleMessage(connection)
+    // }
   }
 
   handleMessage(connection: net.Socket) {
@@ -219,15 +221,17 @@ class Server {
       await once(masterConnection, "data");
       await once(masterConnection, "data");
 
-      masterConnection.on("data", async (data: Buffer) => {
-        const stringService = new StringService(store);
-        const commands = parse(data.toString());
+      this.masterConnection = masterConnection
 
-        for (const fullCommand of commands) {
-          const [command, ...args] = fullCommand;
-          await this.handleCommand(undefined, stringService, command, args);
-        }
-      });
+      // masterConnection.on("data", async (data: Buffer) => {
+      //   const stringService = new StringService(store);
+      //   const commands = parse(data.toString());
+
+      //   for (const fullCommand of commands) {
+      //     const [command, ...args] = fullCommand;
+      //     await this.handleCommand(undefined, stringService, command, args);
+      //   }
+      // });
     });
 
     return masterConnection;
@@ -337,7 +341,7 @@ class Server {
     response: string | Uint8Array,
   ) => {
     console.log("CONNECTION: ", !!connection)
-    if (!connection) return;
+    if (!connection || connection === this.masterConnection) return;
     connection.write(response);
   };
 
