@@ -165,23 +165,21 @@ const parse = (data: string): string[][] => {
 
 class Server {
   private server: net.Server;
-  private masterConnection: net.Socket | null = null
+  private masterConnection: net.Socket | null = null;
 
   constructor(private config: ServerConfigDetails) {
-
     this.server = net.createServer((connection: net.Socket) => {
-      this.handleMessage(connection);
+      const stringService = new StringService(store);
+      this.handleMessage(connection, stringService);
     });
-
   }
 
-  async handleMessage(connection: net.Socket) {
+  async handleMessage(connection: net.Socket, stringService: StringService) {
     connection.on("data", async (data: Buffer) => {
       const commands = parse(data.toString());
-      const stringService = new StringService(store);
 
-      console.log("CONNECTION: ", connection.localPort)
-      console.log("COMMANDS: ", commands)
+      console.log("CONNECTION: ", connection.localPort);
+      console.log("COMMANDS: ", commands);
 
       for (const fullCommand of commands) {
         const [command, ...args] = fullCommand;
@@ -191,7 +189,9 @@ class Server {
     });
   }
 
-    establishConnectionWithMaster(master: string) {
+  establishConnectionWithMaster(master: string) {
+    if (this.masterConnection) return;
+
     const [host, rawPort] = master.trim().split(" ");
     const masterConnection = net.connect(Number(rawPort), host);
 
@@ -216,7 +216,8 @@ class Server {
       await once(masterConnection, "data");
       await once(masterConnection, "data");
 
-      this.masterConnection = masterConnection
+      this.masterConnection = masterConnection;
+
 
       masterConnection.on("data", async (data: Buffer) => {
         const stringService = new StringService(store);
@@ -237,7 +238,7 @@ class Server {
     command: string,
     args: string[],
   ) => {
-    console.log("handling command: ", !!connection)
+    console.log("handling command: ", !!connection);
     switch (command.toUpperCase()) {
       case "PING":
         this.write(connection, stringService.ping());
@@ -334,14 +335,16 @@ class Server {
     connection: net.Socket | undefined,
     response: string | Uint8Array,
   ) => {
-    console.log("CONNECTION: ", !!connection)
+    console.log("CONNECTION: ", !!connection);
     if (!connection) return;
     connection.write(response);
   };
 
   listen(port: number) {
     this.server.listen(port);
-    if (this.config.isReplica) this.establishConnectionWithMaster(this.config.master)
+    if (this.config.isReplica) {
+      this.establishConnectionWithMaster(this.config.master);
+    }
   }
 }
 
